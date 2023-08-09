@@ -11,10 +11,10 @@ contract MainScript is Script {
         vm.startBroadcast();
         Main main = new Main();
         main.addMoney(10, 0x742d35Cc6634C0532925a3b844Bc454e4438f44e);
-        main.punish(5, 0x742d35Cc6634C0532925a3b844Bc454e4438f44e);
+        main.punish(15, 0x742d35Cc6634C0532925a3b844Bc454e4438f44e);
         console.log(
             main.checkVault(0x742d35Cc6634C0532925a3b844Bc454e4438f44e),
-            main.checkDepth(0x742d35Cc6634C0532925a3b844Bc454e4438f44e)
+            main.checkdept(0x742d35Cc6634C0532925a3b844Bc454e4438f44e)
         );
         vm.stopBroadcast();
     }
