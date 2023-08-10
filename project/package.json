@@ -1,0 +1,11 @@
+{
+  "name": "project",
+  "version": "1.0.0",
+  "main": "index.js",
+  "license": "MIT",
+  "devDependencies": {
+    "axios": "^1.4.0",
+    "ethers": "^5.7.2",
+    "web3": "^4.0.3"
+  }
+}
