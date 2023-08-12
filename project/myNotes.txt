@@ -1,0 +1,144 @@
+Start : 27.07.2023
+4.52.00
+
+    Start
++) install : curl -L https://foundry.paradigm.xyz | bash
++) start : forge init -> the directory needs to be empty
++) Compiling : forge compile
++)forge build : install the needed dependencies
++) forge create SimpleStorage --rpc-url HTTP://127.0.0.1:7545 --interactive -> dont forget to change http with the infor from ganache
++) for testing use .s.sol contracts
++)anvil -> with this command it will give you mini blockchain like Ganache
++)cast -> for interactive deployed contracts 
+    Foundry Basics
++)vm.startBroadcast() ... vm.stopBroadcast() -> we are putting the things we want to transact here
++)for running scripts : forge script path/x.sol + put --rpc-url $RPC_URL for simulating on chain + --broadcast --private-key $PRIVATE_KEY : this make the transaction with real chain but think twice before pasting key  
++)for converting hex to decimal : cast --to-base 0x... dec 
++)for more help about cast : cast --help 
++)!!!After changing the .env use : source .env  
++)for printing variables in the terminal use echo : exp : echo $PRIVATE_KEY
++)cast send address[0x...] "function name [exp: store(uint256)]" parameter
++)cast call address[0x...] "function name [exp: retrieve(uint256)]" parameter -> difference between the send and this is this is like blue buttons in Remix no storing but viewing 
++)forge fmt -> formats the code 
++)!! in foundry.toml file :
+remappings=[
+    "@chainlink/contracts/=lib/chainlink-brownie-contracts/contracts/"
+]
+here from now on when you import from chainlink/contracts it will mean lib/...
+
+    General 
++)!!!Assert function consumes all remaining gas if it fails
++)internal override means the function will be called from the parnt
++)CEI : Checks,Effects,Interactions
+-Check -> require etc.
+-Effect -> changing the state of our contract
+-Interaction -> calling another contract or sending ether
+
+
+    Tests
+Foundry Cheat Codes:
++)vm.prank(player) -> pretends that we are player
++)vm.expectRevert() -> here we are expecting the function to revert next at code
++)vm.deal(player,startingUserBalance) -> giving the money to the user account
++)vm.expectEmit() -> here we are expecting the function to emit next at code
++)vm.warp() -> sets the block time
++)vm.roll() -> sets the block number
++)
+Write some deploy scripts
+Write our tests:
+    1)Work on local chain 
+    2)forked testnet
+    3)forked mainnet
++)for test files use .t.sol also use :
+import {Test,console} from "forge-std/Test.sol";
+contract FundMeTest is Test {
+    //setUp always runs first
+    function setUp() external {}
+
+
+    function testDemo() public {}
+}
+
++)forge test -vv -> here if we increase the number of the v it will give us more lines of output
++)assertEq(x,y) -> here we are checking does x equal to y othervise there is a error
++)for specific function test : forge test -m functionName
++)forge coverage --fork-url $SEPOLIA_RPC_URL -> shows what percentage of the code is tested
++)vm.expectRevert() -> here we are expecting the function to revert next at code 
++)function prank(address) external -> here we are changing msg.sender to another address for the next call 
++)makeAddr("user") -> Creates an address derived from the provided name. A label is created for the derived address with the provided name used as the label value.
+address alice = makeAddr("alice");
+emit log_address(alice); // 0x328809bc894f92807417d2dad6b7c998c1afdac6
++)custom error : this is more gas efficent than the require 
+error nameOfTheContract__errorName(); -> also inside of the contract 
+if (condition){
+    revert nameOfTheContract__errorName(); -> to the place we want 
+}
+
+    Deploying
++)
+source .env
+echo $RPC_URL
+forge create --rpc-url $RPC_URL --private-key $PRIVATE_KEY src/{ContractFile.sol}:{ContractName} --legacy
+
+
+    Script
++)
+source .env
+forge script script/Main.s.sol:MainScript --broadcast --verify --rpc-url --private-key 
+
+    Mapping
++)maps cannot be looped. They are like hashtables
++)
++)
++)
++)
++)
++)
++)
++)
++)
++)
++)
++)
++)
++)
++)
++)
++)
++)
++)
++)
++)
++)
++)
++)
++)
++)
++)
++)
++)
++)
++)
++)
++)
+    Code Order 
+// Layout of Contract:
+// version
+// imports
+// errors
+// interfaces, libraries, contracts
+// Type declarations
+// State variables
+// Events
+// Modifiers
+// Functions
+
+// Layout of Functions:
+// constructor
+// receive function (if exists)
+// fallback function (if exists)
+// external
+// public
+// internal
+// private
+// view & pure functions

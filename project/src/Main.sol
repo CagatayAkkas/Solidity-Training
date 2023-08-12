@@ -1,6 +1,6 @@
-// SPDX-License-Identifier: UNLICENSED
+// SPDX-License-Identifier: MIT
 
-pragma solidity ^0.8.13;
+pragma solidity 0.8.13;
 
 // @title Main Contract
 // @dev This contract allows users to manage transactions, balances, and penalties.
@@ -19,8 +19,9 @@ contract Main {
 
     // @dev Event to log transactions with product code and price.
     event Transaction(
-        address indexed _productCode,
-        uint256 indexed _priceOfTheProduct
+        uint256 indexed _amountOfProduct,
+        uint256 indexed _priceOfTheProduct,
+        address indexed _productCode
     );
     event punishment(bool indexed _punishment);
 
@@ -35,10 +36,11 @@ contract Main {
     // @param _productCode Address representation of the product code.
     // @param _priceOfTheProduct Price of the product.
     function transaction(
-        address _productCode,
-        uint256 _priceOfTheProduct
+        uint256 _amountOfProduct,
+        uint256 _priceOfTheProduct,
+        address _productCode
     ) public {
-        emit Transaction(_productCode, _priceOfTheProduct);
+        emit Transaction(_amountOfProduct, _priceOfTheProduct, _productCode);
     }
 
     // @dev Function to apply a penalty to an address.

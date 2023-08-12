@@ -13,7 +13,7 @@ contract Seller is Test {
     }
 
     function testTransaction() public {
-        main.transaction(testAddress, 5);
+        main.transaction(5, 10, testAddress);
     }
 
     function testAddMoney() public {
