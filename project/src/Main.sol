@@ -21,7 +21,8 @@ contract Main {
     event Transaction(
         uint256 indexed _amountOfProduct,
         uint256 indexed _priceOfTheProduct,
-        address indexed _productCode
+        address indexed _productCode,
+        address _marketAddress
     );
     event punishment(bool indexed _punishment);
 
@@ -38,9 +39,15 @@ contract Main {
     function transaction(
         uint256 _amountOfProduct,
         uint256 _priceOfTheProduct,
-        address _productCode
+        address _productCode,
+        address _marketAddress
     ) public {
-        emit Transaction(_amountOfProduct, _priceOfTheProduct, _productCode);
+        emit Transaction(
+            _amountOfProduct,
+            _priceOfTheProduct,
+            _productCode,
+            _marketAddress
+        );
     }
 
     // @dev Function to apply a penalty to an address.
