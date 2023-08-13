@@ -1065,7 +1065,7 @@ web3-validator@^1.0.2:
 
 web3@^4.0.3:
   version "4.0.3"
-  resolved "https://registry.npmjs.org/web3/-/web3-4.0.3.tgz"
+  resolved "https://registry.yarnpkg.com/web3/-/web3-4.0.3.tgz#afeb977c9f883ff683d630ab9f5937eb56bc7cf4"
   integrity sha512-rUMxui5f52yPWjiMRQV6xqIrTQSovYM2CNhl57y+xj/fGXNLbI1D5FsLPnUMZjMaFHJBTteaBxq/sTEaw/1jNA==
   dependencies:
     web3-core "^4.0.3"
