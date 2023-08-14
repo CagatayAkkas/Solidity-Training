@@ -70,6 +70,7 @@ contract Main {
     // @dev Function to buy a product, deducting the cost from the vault.
     // @param marketAddress Address of the market.
     // @param priceOfTheProduct Price of the product to be bought.
+    //request product
     function buyProduct(
         address marketAddress,
         uint256 priceOfTheProduct

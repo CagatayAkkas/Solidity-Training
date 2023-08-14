@@ -1,46 +1,49 @@
+from flask import Flask, jsonify
 import requests
 
-hashMapOfProducts = {
-#Albeni
-    "0x6E2fC3E4c7d4eC1b1293aD91C7a9e10C5a16fFee" : 1,
-#Ayran
-    "0x52fA377A44B9e3c918D75293c7A6e488Ea487a94":2,
-#Makarna
-    "0x8Bf9Cf4b3415e6A2f5EA05E49B2a9C20F3c64bA3":3,
+app = Flask(__name__)
 
+hashMapOfProducts = {
+    "0x742d35cc6634c0532925a3b844bc454e4438f44e": 1,
+    "0xAnotherProductAddressHere": 2,
+    "0xAnotherProductAddressHere2": 3,
 }
 
-url = "https://api-sepolia.etherscan.io/api?module=logs&action=getLogs&fromBlock=0&toBlock=latest&address=0xE32DAF04A5328b4598F754538D2058EbBb7a3E76&api_key=9MWB7ZQYSHVYVE7C85IPMSQUVR1CAYUTWN"
-response = requests.get(url)
+# marketAddresses[[marketAddress , productCode , productAmount]]
 
-# Extracting the result from the response
-result = response.json().get('result')
+url = "https://api-sepolia.etherscan.io/api?module=logs&action=getLogs&fromBlock=0&toBlock=latest&address=0xDFF2526dA273A765cBEdf2ad25551fcc10d71BE0&api_key=9MWB7ZQYSHVYVE7C85IPMSQUVR1CAYUTWN"
 
-# Extracting and printing the topics array from the result
-if result and len(result) > 0:
-    topics = result[0].get('topics')
-    amountOfProduct = int(topics[1], 16)
-    priceOfTheProduct = int(topics[2], 16)
-    productCode = "0x" + str(topics[3][-40:])
-    print(amountOfProduct)
-    print(priceOfTheProduct)
-    print(productCode)
-else:
-    print("No topics found")
-# 0x6E2fC3E4c7d4eC1b1293aD91C7a9e10C5a16fFee
-# 0x52fA377A44B9e3c918D75293c7A6e488Ea487a94
-# 0x8Bf9Cf4b3415e6A2f5EA05E49B2a9C20F3c64bA3
-# 0x9eCE15Df30d3DAd64FbF3E5e8cDb16aFaA9b2a8C
-# 0x3D0Aa4649e683fe7865df75f22a1a494Bf252c22
-# 0x4743F7f1B434dF4eC38c7922fA952f034a9C68E4
-# 0x9f2B77dC5298f65e4F557a99494dce76B2f7Cf17
-# 0xF5E23CfC5e812C7951Fa4869f81aDaf5A78a0eD5
-# 0x6eE407eDF83Ae76Ae2Ce0e1e839ab2f080A5D692
-# 0xa81A9bD16601dCeC307Fd862375e4F9F0e00C225
-
-def checkTransactionPrice(priceOfTheProduct, productCode):
-    if priceOfTheProduct/amountOfProduct <= hashMapOfProducts[productCode]:
-        print("Price is ok") 
+def get_product_info():
+    response = requests.get(url)
+    result = response.json().get('result')
+    if result and len(result) > 0:
+        topics = result[0].get('topics')
+        sellingPrice = int(topics[2], 16) // int(topics[1], 16)
+        productCode = "0x" + topics[3][-40:]  # The last 40 characters of the fourth topic
+        realPrice = hashMapOfProducts.get(productCode.lower()) # Fetching from the hashmap using the lowercase product code
+        marketAddress = result[0]['data'][26:]  # Extracting the address, skipping the first 26 characters (24 zeros + 0x)
+        print(marketAddress)
+        return productCode, realPrice, sellingPrice , marketAddress
     else:
-        print("Price is not ok")
+        return None, None, None
 
+
+
+@app.route('/api/products', methods=['GET'])
+def products():
+    productCode, realPrice, sellingPrice , marketAddress = get_product_info() # Notice the updated return values
+    print(productCode, realPrice, sellingPrice)
+    if productCode:
+        product_info = {
+            "addressOfProduct": productCode,
+            "realPrice": realPrice,
+            "sellingPrice": sellingPrice,
+            "marketAddress": marketAddress
+        }
+        return jsonify([product_info])
+    else:
+        return jsonify({"error": "No product found"}), 400
+
+
+if __name__ == '__main__':
+    app.run(port=5000)

@@ -626,6 +626,11 @@ ethers@^5.7.2:
     "@ethersproject/web" "5.7.1"
     "@ethersproject/wordlists" "5.7.0"
 
+flask@^0.2.10:
+  version "0.2.10"
+  resolved "https://registry.yarnpkg.com/flask/-/flask-0.2.10.tgz#f5f5a42cfd58a309e37c67c0a39617a819e5e1b7"
+  integrity sha512-Zy69KIuFsoX0o2W5uDHHk1GHMwRT8QT0AboPQY7b1soCfJ2pfwKxHF2AGVwJmDUjzawgOavoY/UsXnZ7fk3lVQ==
+
 follow-redirects@^1.15.0:
   version "1.15.2"
   resolved "https://registry.npmjs.org/follow-redirects/-/follow-redirects-1.15.2.tgz"

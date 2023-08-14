@@ -8,7 +8,7 @@ contract MainScript is Script {
     Main main; // Declare main as state variable
 
     constructor() {
-        main = Main(0xfC2A87881939da0385C89B49c8c8e4C43a822232); // Initialize main with the deployed address
+        main = Main(0xDFF2526dA273A765cBEdf2ad25551fcc10d71BE0); // Initialize main with the deployed address
     }
 
     function setUp() public {}
