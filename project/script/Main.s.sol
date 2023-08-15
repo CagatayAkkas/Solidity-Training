@@ -8,7 +8,7 @@ contract MainScript is Script {
     Main main; // Declare main as state variable
 
     constructor() {
-        main = Main(0xDFF2526dA273A765cBEdf2ad25551fcc10d71BE0); // Initialize main with the deployed address
+        main = Main(0x908f15307770E5A92552074BD926a81C0770fF1B); // Initialize main with the deployed address
     }
 
     function setUp() public {}
@@ -18,7 +18,14 @@ contract MainScript is Script {
         main.transaction(
             3,
             10,
-            0x742d35Cc6634C0532925a3b844Bc454e4438f44e,
+            0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266,
+            0x7EFd0B777026A9c42757d92A3f79361467372435
+        );
+        main.addMoney(100, 0x7EFd0B777026A9c42757d92A3f79361467372435);
+        main.requestProduct(
+            10,
+            10,
+            0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266,
             0x7EFd0B777026A9c42757d92A3f79361467372435
         );
 

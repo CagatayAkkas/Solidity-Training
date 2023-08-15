@@ -24,6 +24,13 @@ contract Main {
         address indexed _productCode,
         address _marketAddress
     );
+    event buyRequest(
+        uint256 indexed _amountOfProduct,
+        uint256 indexed _priceOfTheProduct,
+        address indexed _productCode,
+        address _marketAddress
+    );
+
     event punishment(bool indexed _punishment);
 
     // @dev Function to add money to a market's vault.
@@ -63,6 +70,7 @@ contract Main {
         } else {
             vault[guiltyAddress] -= penaltyFee;
         }
+        //bunu ifin icine alabiliriz
         emit punishment(true);
         return true;
     }
@@ -71,15 +79,31 @@ contract Main {
     // @param marketAddress Address of the market.
     // @param priceOfTheProduct Price of the product to be bought.
     //request product
-    function buyProduct(
-        address marketAddress,
-        uint256 priceOfTheProduct
+    function requestProduct(
+        uint256 amountOfProduct,
+        uint256 totalPrice,
+        address addressOfProduct,
+        address marketAddress
     ) public {
-        if (vault[marketAddress] < priceOfTheProduct) {
+        if (vault[marketAddress] < totalPrice) {
             revert("Not enough money");
         } else {
-            vault[marketAddress] -= priceOfTheProduct;
+            emit buyRequest(
+                amountOfProduct,
+                totalPrice,
+                addressOfProduct,
+                marketAddress
+            );
         }
+    }
+
+    function buyProduct(
+        uint256 amountOfProduct,
+        uint256 totalPrice,
+        address addressOfProduct,
+        address marketAddress
+    ) public {
+        vault[marketAddress] -= totalPrice;
     }
 
     // @dev Function to check the money stored in a market's vault.
