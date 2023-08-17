@@ -4,15 +4,15 @@ import requests
 app = Flask(__name__)
 
 hashMapOfProducts = {
-    "0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266": 1,
+    "0xf39fd6e51aad88f6f4ce6ab8827279cfffb92266": 1,
     "0xAnotherProductAddressHere": 2,
     "0xAnotherProductAddressHere2": 3,
 }
 
-marketAddresses= [["0x7EFd0B777026A9c42757d92A3f79361467372435" , "0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266" , 40]]
-#                       marketAddress                          productAddress                               totalAmountInHand
+marketAddresses= [["0x7EFd0B777026A9c42757d92A3f79361467372435" , "0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266" , 40 , 10]]
+#                       marketAddress                          productAddress                               totalAmountInHand  #Punish Amount
 
-exampleHashMap = {address[0]: [address[1], address[2]] for address in marketAddresses}
+exampleHashMap = {address[0]: [address[1], address[2],address[3]] for address in marketAddresses}
 
 
 #0x7EFd0B777026A9c42757d92A3f79361467372435 -> benim adres, market adres
@@ -27,43 +27,62 @@ exampleHashMap = {address[0]: [address[1], address[2]] for address in marketAddr
 # 0x17a2E8400e2CA602F8453E214b8a813ca69E8fF4
 # 0xf9Cf6A857F6faA8e7600fB0B6fC45e5c28d6b458
 
-url = "https://api-sepolia.etherscan.io/api?module=logs&action=getLogs&fromBlock=0&toBlock=latest&address=0x908f15307770E5A92552074BD926a81C0770fF1B&api_key=9MWB7ZQYSHVYVE7C85IPMSQUVR1CAYUTWN"
+api_data_counter = 0
+url = "https://api-sepolia.etherscan.io/api?module=logs&action=getLogs&fromBlock=0&toBlock=latest&address=0x0eE22cA5dC70Ee5f9169D65505cC9982Fb51CcE5&api_key=9MWB7ZQYSHVYVE7C85IPMSQUVR1CAYUTWN"
 
 #Kendimize notlar:
 #Counter eklenerek topics arraylerinin iclerindeki hardcode giderilebilir.
 #örnek sayıları arttırılmalı.
 def get_product_info():
+    global api_data_counter 
     response = requests.get(url)
     result = response.json().get('result')
-    if result and len(result) > 0:
-        topics = result[0].get('topics')
+    
+    if result and len(result) > api_data_counter:
+        api_data_counter = len(result)-1
+        topics = result[api_data_counter].get('topics')
+        contractAddress = result[api_data_counter]['address']
+        
         sellingPrice = int(topics[2], 16) // int(topics[1], 16)
+        
+        
         productCode = "0x" + topics[3][-40:]  # The last 40 characters of the fourth topic
+        needPunish = False
         realPrice = hashMapOfProducts.get(productCode.lower()) # Fetching from the hashmap using the lowercase product code
-        marketAddress = result[0]['data'][26:]  # Extracting the address, skipping the first 26 characters (24 zeros + 0x)
-        print(marketAddress)
-        topics2 = result[1].get('topics')
-        buyerAddress = result[1]['data'][26:]  # Extracting buyer address
+
+        marketAddress = result[api_data_counter]['data'][26:]  # Extracting the address, skipping the first 26 characters (24 zeros + 0x)
+        topics2 = result[api_data_counter].get('topics')
+        buyerAddress = result[api_data_counter]['data'][26:]  # Extracting buyer address
         wantedProductAddress = "0x" + topics2[3][-40:]  # Extracting wanted product address
         wantedAmountOfProduct = int(topics2[1], 16)  # Converting hex to int for wanted amount of product
+        #bu nedir bulunmalı
         theMoneyToBuy = int(topics2[2], 16) # Extracting money to buy and converting from hex to int
+        
         dataOfMarket = exampleHashMap.get("0x7EFd0B777026A9c42757d92A3f79361467372435")
-        codeOfProductFromMarket , currentStock = dataOfMarket[0] , dataOfMarket[1]
-        print("code of product is :" + codeOfProductFromMarket + " and current stock is :" + str(currentStock) + "wanted " + str(wantedProductAddress) , " wanted amount" + str(wantedAmountOfProduct))
+        codeOfProductFromMarket, currentStock, punishAmount = dataOfMarket[0], dataOfMarket[1], dataOfMarket[2]
+        if realPrice < sellingPrice:
+            needPunish = True
+            punishAmount = punishAmount +10
+            
+        if needPunish == False :
+            #bu gercek depoda dusulmeli
+            currentStock -= int(topics[1], 16)
                 #buradaki şartlar düzenlenmeli
-        if currentStock >= wantedAmountOfProduct and str(codeOfProductFromMarket.lower()) == str(wantedProductAddress.lower()):
+        canSell = False
+        print("api data counter " + str(api_data_counter) +"\n contract Address " + str(contractAddress) + "\n selling price" + str(sellingPrice) + "\n product code" + str(productCode) + "\n real price " + str(realPrice) + "\n market address " + str(marketAddress) + "\n buyer address " + str(buyerAddress) + "\n wanted product address " + str(wantedProductAddress) + "\n wanted amount of product " + str(wantedAmountOfProduct) + "\n the money to buy " + str(theMoneyToBuy) + "\n code of product from market " + str(codeOfProductFromMarket) + "\n current stock " + str(currentStock) + "\n punish amount " + str(punishAmount) + "\n need punish " + str(needPunish) + "\n contract address " + str(contractAddress))
+        if currentStock >= wantedAmountOfProduct and theMoneyToBuy >= wantedAmountOfProduct* (hashMapOfProducts.get(wantedProductAddress.lower()))  and str(codeOfProductFromMarket.lower()) == str(wantedProductAddress.lower()):
             canSell = True
-            #true ise ürünler marketin hesabına eklenmeli
+            currentStock += wantedAmountOfProduct
             print("The product is available in the market")
-        return productCode, realPrice, sellingPrice , marketAddress , buyerAddress , wantedProductAddress , wantedAmountOfProduct , theMoneyToBuy , canSell
+        return productCode, realPrice, sellingPrice , marketAddress , buyerAddress , wantedProductAddress , wantedAmountOfProduct , theMoneyToBuy , canSell , punishAmount ,needPunish ,contractAddress
     else:
-        return None, None, None, None, None, None, None, None, None
+        return None, None, None, None, None, None, None, None, None, None, None, None
 
 
 
 @app.route('/api/products', methods=['GET'])
 def products():
-    productCode, realPrice, sellingPrice , marketAddress,buyerAddress , wantedProductAddress , wantedAmountOfProduct , theMoneyToBuy,canSell  = get_product_info() # Notice the updated return values
+    productCode, realPrice, sellingPrice , marketAddress,buyerAddress , wantedProductAddress , wantedAmountOfProduct , theMoneyToBuy,canSell, punishAmount,needPunish , contractAddress = get_product_info() # Notice the updated return values
     print(productCode, realPrice, sellingPrice)
     if productCode:
         product_info = {
@@ -75,7 +94,10 @@ def products():
             "wantedProductAddress": wantedProductAddress,
             "wantedAmountOfProduct": wantedAmountOfProduct,
             "theMoneyToBuy": theMoneyToBuy,
-            "canSell": canSell
+            "canSell": canSell,
+            "punishAmount": punishAmount,
+            "needPunish": needPunish,
+            "contractAddress": contractAddress
 
 
         }
@@ -87,23 +109,3 @@ def products():
 if __name__ == '__main__':
     app.run(port=5000)
 
-
-
-#     Working code
-# def get_product_info():
-#     response = requests.get(url)
-#     result = response.json().get('result')
-#     if result and len(result) > 0:
-#         topics = result[0].get('topics')
-#         sellingPrice = int(topics[2], 16) // int(topics[1], 16)
-#         productCode = "0x" + topics[3][-40:]  # The last 40 characters of the fourth topic
-#         realPrice = hashMapOfProducts.get(productCode.lower()) # Fetching from the hashmap using the lowercase product code
-#         marketAddress = result[0]['data'][26:]  # Extracting the address, skipping the first 26 characters (24 zeros + 0x)
-#         print(marketAddress)
-#     #buyyerAddress =
-#     #wantedProductAddress =
-#     #theMoneyToBuy = 
-#     #wantedAmountOfProduct = 
-#         return productCode, realPrice, sellingPrice , marketAddress
-#     else:
-#         return None, None, None

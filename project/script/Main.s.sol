@@ -8,7 +8,7 @@ contract MainScript is Script {
     Main main; // Declare main as state variable
 
     constructor() {
-        main = Main(0x908f15307770E5A92552074BD926a81C0770fF1B); // Initialize main with the deployed address
+        main = Main(0x0eE22cA5dC70Ee5f9169D65505cC9982Fb51CcE5); // Initialize main with the deployed address
     }
 
     function setUp() public {}
@@ -16,18 +16,18 @@ contract MainScript is Script {
     function run() public {
         vm.startBroadcast();
         main.transaction(
-            3,
-            10,
+            1,
+            50,
             0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266,
             0x7EFd0B777026A9c42757d92A3f79361467372435
         );
-        main.addMoney(100, 0x7EFd0B777026A9c42757d92A3f79361467372435);
-        main.requestProduct(
-            10,
-            10,
-            0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266,
-            0x7EFd0B777026A9c42757d92A3f79361467372435
-        );
+        // main.addMoney(100, 0x7EFd0B777026A9c42757d92A3f79361467372435);
+        // main.requestProduct(
+        //     30,
+        //     50,
+        //     0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266,
+        //     0x7EFd0B777026A9c42757d92A3f79361467372435
+        // );
 
         vm.stopBroadcast();
     }

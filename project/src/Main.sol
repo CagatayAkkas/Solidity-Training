@@ -22,13 +22,15 @@ contract Main {
         uint256 indexed _amountOfProduct,
         uint256 indexed _priceOfTheProduct,
         address indexed _productCode,
-        address _marketAddress
+        address _marketAddress,
+        address _contractAddress
     );
     event buyRequest(
         uint256 indexed _amountOfProduct,
         uint256 indexed _priceOfTheProduct,
         address indexed _productCode,
-        address _marketAddress
+        address _marketAddress,
+        address _contractAddress
     );
 
     event punishment(bool indexed _punishment);
@@ -53,7 +55,8 @@ contract Main {
             _amountOfProduct,
             _priceOfTheProduct,
             _productCode,
-            _marketAddress
+            _marketAddress,
+            address(this)
         );
     }
 
@@ -92,7 +95,8 @@ contract Main {
                 amountOfProduct,
                 totalPrice,
                 addressOfProduct,
-                marketAddress
+                marketAddress,
+                address(this)
             );
         }
     }
