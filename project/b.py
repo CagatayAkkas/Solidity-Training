@@ -41,42 +41,44 @@ def get_product_info():
     if result and len(result) > api_data_counter:
         api_data_counter = len(result)-1
         topics = result[api_data_counter].get('topics')
-        contractAddress = result[api_data_counter]['address']
-        
-        sellingPrice = int(topics[2], 16) // int(topics[1], 16)
-        
-        
-        productCode = "0x" + topics[3][-40:]  # The last 40 characters of the fourth topic
-        needPunish = False
-        realPrice = hashMapOfProducts.get(productCode.lower()) # Fetching from the hashmap using the lowercase product code
-
-        marketAddress = result[api_data_counter]['data'][26:]  # Extracting the address, skipping the first 26 characters (24 zeros + 0x)
-        topics2 = result[api_data_counter].get('topics')
-        buyerAddress = result[api_data_counter]['data'][26:]  # Extracting buyer address
-        wantedProductAddress = "0x" + topics2[3][-40:]  # Extracting wanted product address
-        wantedAmountOfProduct = int(topics2[1], 16)  # Converting hex to int for wanted amount of product
-        #bu nedir bulunmalı
-        theMoneyToBuy = int(topics2[2], 16) # Extracting money to buy and converting from hex to int
-        
-        dataOfMarket = exampleHashMap.get("0x7EFd0B777026A9c42757d92A3f79361467372435")
-        codeOfProductFromMarket, currentStock, punishAmount = dataOfMarket[0], dataOfMarket[1], dataOfMarket[2]
-        if realPrice < sellingPrice:
-            needPunish = True
-            punishAmount = punishAmount +10
+        if len(topics) != 2:
+            #topicin boyutu 2 ise tum bu satırları atlayıp yeni api data bulmaya gec
+            contractAddress = result[api_data_counter]['address']
             
-        if needPunish == False :
-            #bu gercek depoda dusulmeli
-            currentStock -= int(topics[1], 16)
-                #buradaki şartlar düzenlenmeli
-        canSell = False
-        print("api data counter " + str(api_data_counter) +"\n contract Address " + str(contractAddress) + "\n selling price" + str(sellingPrice) + "\n product code" + str(productCode) + "\n real price " + str(realPrice) + "\n market address " + str(marketAddress) + "\n buyer address " + str(buyerAddress) + "\n wanted product address " + str(wantedProductAddress) + "\n wanted amount of product " + str(wantedAmountOfProduct) + "\n the money to buy " + str(theMoneyToBuy) + "\n code of product from market " + str(codeOfProductFromMarket) + "\n current stock " + str(currentStock) + "\n punish amount " + str(punishAmount) + "\n need punish " + str(needPunish) + "\n contract address " + str(contractAddress))
-        if currentStock >= wantedAmountOfProduct and theMoneyToBuy >= wantedAmountOfProduct* (hashMapOfProducts.get(wantedProductAddress.lower()))  and str(codeOfProductFromMarket.lower()) == str(wantedProductAddress.lower()):
-            canSell = True
-            currentStock += wantedAmountOfProduct
-            print("The product is available in the market")
-        return productCode, realPrice, sellingPrice , marketAddress , buyerAddress , wantedProductAddress , wantedAmountOfProduct , theMoneyToBuy , canSell , punishAmount ,needPunish ,contractAddress
-    else:
-        return None, None, None, None, None, None, None, None, None, None, None, None
+            sellingPrice = int(topics[2], 16) // int(topics[1], 16)
+            
+            
+            productCode = "0x" + topics[3][-40:]  # The last 40 characters of the fourth topic
+            needPunish = False
+            realPrice = hashMapOfProducts.get(productCode.lower()) # Fetching from the hashmap using the lowercase product code
+
+            marketAddress = result[api_data_counter]['data'][26:]  # Extracting the address, skipping the first 26 characters (24 zeros + 0x)
+            topics2 = result[api_data_counter].get('topics')
+            buyerAddress = result[api_data_counter]['data'][26:]  # Extracting buyer address
+            wantedProductAddress = "0x" + topics2[3][-40:]  # Extracting wanted product address
+            wantedAmountOfProduct = int(topics2[1], 16)  # Converting hex to int for wanted amount of product
+            #bu nedir bulunmalı
+            theMoneyToBuy = int(topics2[2], 16) # Extracting money to buy and converting from hex to int
+            
+            dataOfMarket = exampleHashMap.get("0x7EFd0B777026A9c42757d92A3f79361467372435")
+            codeOfProductFromMarket, currentStock, punishAmount = dataOfMarket[0], dataOfMarket[1], dataOfMarket[2]
+            if realPrice < sellingPrice:
+                needPunish = True
+                punishAmount = punishAmount +10
+                
+            if needPunish == False :
+                #bu gercek depoda dusulmeli
+                currentStock -= int(topics[1], 16)
+                    #buradaki şartlar düzenlenmeli
+            canSell = False
+            print("api data counter " + str(api_data_counter) +"\n contract Address " + str(contractAddress) + "\n selling price" + str(sellingPrice) + "\n product code" + str(productCode) + "\n real price " + str(realPrice) + "\n market address " + str(marketAddress) + "\n buyer address " + str(buyerAddress) + "\n wanted product address " + str(wantedProductAddress) + "\n wanted amount of product " + str(wantedAmountOfProduct) + "\n the money to buy " + str(theMoneyToBuy) + "\n code of product from market " + str(codeOfProductFromMarket) + "\n current stock " + str(currentStock) + "\n punish amount " + str(punishAmount) + "\n need punish " + str(needPunish) + "\n contract address " + str(contractAddress))
+            if currentStock >= wantedAmountOfProduct and theMoneyToBuy >= wantedAmountOfProduct* (hashMapOfProducts.get(wantedProductAddress.lower()))  and str(codeOfProductFromMarket.lower()) == str(wantedProductAddress.lower()):
+                canSell = True
+                currentStock += wantedAmountOfProduct
+                print("The product is available in the market")
+            return productCode, realPrice, sellingPrice , marketAddress , buyerAddress , wantedProductAddress , wantedAmountOfProduct , theMoneyToBuy , canSell , punishAmount ,needPunish ,contractAddress
+        else:
+            return None, None, None, None, None, None, None, None, None, None, None, None
 
 
 
@@ -89,7 +91,7 @@ def products():
             "addressOfProduct": productCode,
             "realPrice": realPrice,
             "sellingPrice": sellingPrice,
-            "marketAddress": marketAddress,
+            "marketAddress": str(marketAddress),
             "buyerAddress": buyerAddress,
             "wantedProductAddress": wantedProductAddress,
             "wantedAmountOfProduct": wantedAmountOfProduct,
@@ -97,7 +99,7 @@ def products():
             "canSell": canSell,
             "punishAmount": punishAmount,
             "needPunish": needPunish,
-            "contractAddress": contractAddress
+            "contractAddress": str(contractAddress)
 
 
         }
