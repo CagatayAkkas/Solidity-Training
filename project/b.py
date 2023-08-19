@@ -1,5 +1,6 @@
 from flask import Flask, jsonify
 import requests
+from apscheduler.schedulers.background import BackgroundScheduler
 
 app = Flask(__name__)
 
@@ -9,8 +10,12 @@ hashMapOfProducts = {
     "0xAnotherProductAddressHere2": 3,
 }
 
-marketAddresses= [["0x7EFd0B777026A9c42757d92A3f79361467372435" , "0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266" , 40 , 10]]
-#                       marketAddress                          productAddress                               totalAmountInHand  #Punish Amount
+marketAddresses = [
+    ["0x7EFd0B777026A9c42757d92A3f79361467372435", "0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266", 40, 10],
+    ["0xNewMarketAddress1Here", "0xNewProductAddress1Here", 50, 15],
+    ["0xNewMarketAddress2Here", "0xNewProductAddress2Here", 60, 20]
+]
+#    marketAddress           productAddress                totalAmountInHand  #Punish Amount
 
 exampleHashMap = {address[0]: [address[1], address[2],address[3]] for address in marketAddresses}
 
@@ -39,8 +44,13 @@ def get_product_info():
     result = response.json().get('result')
     
     if result and len(result) > api_data_counter:
+        result_item = result[api_data_counter]
+        if isinstance(result_item, dict):
+            topics = result_item.get('topics')
+        else:
+            print("Unexpected result item:", result_item)
+            return (None,) * 12
         api_data_counter = len(result)-1
-        topics = result[api_data_counter].get('topics')
         if len(topics) != 2:
             #topicin boyutu 2 ise tum bu satırları atlayıp yeni api data bulmaya gec
             contractAddress = result[api_data_counter]['address']
@@ -52,9 +62,9 @@ def get_product_info():
             needPunish = False
             realPrice = hashMapOfProducts.get(productCode.lower()) # Fetching from the hashmap using the lowercase product code
 
-            marketAddress = result[api_data_counter]['data'][26:]  # Extracting the address, skipping the first 26 characters (24 zeros + 0x)
+            marketAddress = result[api_data_counter]['data'][26:66]  # Extracting the address, skipping the first 26 characters (24 zeros + 0x)
             topics2 = result[api_data_counter].get('topics')
-            buyerAddress = result[api_data_counter]['data'][26:]  # Extracting buyer address
+            buyerAddress = result[api_data_counter]['data'][26:66]  # Extracting buyer address
             wantedProductAddress = "0x" + topics2[3][-40:]  # Extracting wanted product address
             wantedAmountOfProduct = int(topics2[1], 16)  # Converting hex to int for wanted amount of product
             #bu nedir bulunmalı
@@ -78,15 +88,19 @@ def get_product_info():
                 print("The product is available in the market")
             return productCode, realPrice, sellingPrice , marketAddress , buyerAddress , wantedProductAddress , wantedAmountOfProduct , theMoneyToBuy , canSell , punishAmount ,needPunish ,contractAddress
         else:
-            return None, None, None, None, None, None, None, None, None, None, None, None
+            return (None,) * 12
 
+
+def scheduled_product_info():
+    get_product_info()
+    print("Updated product info")
 
 
 @app.route('/api/products', methods=['GET'])
 def products():
     productCode, realPrice, sellingPrice , marketAddress,buyerAddress , wantedProductAddress , wantedAmountOfProduct , theMoneyToBuy,canSell, punishAmount,needPunish , contractAddress = get_product_info() # Notice the updated return values
     print(productCode, realPrice, sellingPrice)
-    if productCode:
+    if productCode or realPrice or sellingPrice or marketAddress or buyerAddress or wantedProductAddress or wantedAmountOfProduct or theMoneyToBuy or canSell or punishAmount or needPunish or contractAddress:
         product_info = {
             "addressOfProduct": productCode,
             "realPrice": realPrice,
@@ -106,6 +120,11 @@ def products():
         return jsonify([product_info])
     else:
         return jsonify({"error": "No product found"}), 400
+
+scheduler = BackgroundScheduler(daemon=True)
+# Schedule the job to update the product info every 7 seconds
+scheduler.add_job(scheduled_product_info, 'interval', seconds=30)
+scheduler.start()
 
 
 if __name__ == '__main__':
