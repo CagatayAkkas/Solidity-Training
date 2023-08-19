@@ -1,6 +1,7 @@
 const express = require("express");
 const axios = require("axios");
 const { scheduleJob } = require("node-schedule");
+const { ethers } = require("ethers");
 
 const app = express();
 const port = 5000;
@@ -30,7 +31,523 @@ const exampleHashMap = marketAddresses.reduce((acc, address) => {
 let apiDataCounter = 0;
 
 const url =
-  "https://api-sepolia.etherscan.io/api?module=logs&action=getLogs&fromBlock=0&toBlock=latest&address=0x0eE22cA5dC70Ee5f9169D65505cC9982Fb51CcE5&api_key=9MWB7ZQYSHVYVE7C85IPMSQUVR1CAYUTWN";
+  "https://api-sepolia.etherscan.io/api?module=logs&action=getLogs&fromBlock=0&toBlock=latest&address=0xdcC4796AFD0c1F5f3adF07eD4008462E70d4b948&api_key=9MWB7ZQYSHVYVE7C85IPMSQUVR1CAYUTWN";
+
+const provider = new ethers.providers.JsonRpcProvider(
+  "https://eth-sepolia.g.alchemy.com/v2/AsRLVXZLZMPKrruB1nFRRSGfSquRWJtA"
+);
+
+const contractAbi = [
+  {
+    inputs: [],
+    name: "acceptOwnership",
+    outputs: [],
+    stateMutability: "nonpayable",
+    type: "function",
+  },
+  {
+    inputs: [
+      {
+        internalType: "uint256",
+        name: "moneyAmount",
+        type: "uint256",
+      },
+      {
+        internalType: "address",
+        name: "marketAddress",
+        type: "address",
+      },
+    ],
+    name: "addMoney",
+    outputs: [],
+    stateMutability: "nonpayable",
+    type: "function",
+  },
+  {
+    inputs: [
+      {
+        internalType: "uint256",
+        name: "amountOfProduct",
+        type: "uint256",
+      },
+      {
+        internalType: "uint256",
+        name: "totalPrice",
+        type: "uint256",
+      },
+      {
+        internalType: "address",
+        name: "addressOfProduct",
+        type: "address",
+      },
+      {
+        internalType: "address",
+        name: "marketAddress",
+        type: "address",
+      },
+    ],
+    name: "buyProduct",
+    outputs: [],
+    stateMutability: "nonpayable",
+    type: "function",
+  },
+  {
+    inputs: [
+      {
+        internalType: "address",
+        name: "marketAddress",
+        type: "address",
+      },
+    ],
+    name: "checkVault",
+    outputs: [
+      {
+        internalType: "uint256",
+        name: "",
+        type: "uint256",
+      },
+    ],
+    stateMutability: "nonpayable",
+    type: "function",
+  },
+  {
+    inputs: [],
+    stateMutability: "nonpayable",
+    type: "constructor",
+  },
+  {
+    anonymous: false,
+    inputs: [
+      {
+        indexed: true,
+        internalType: "bytes32",
+        name: "id",
+        type: "bytes32",
+      },
+    ],
+    name: "ChainlinkCancelled",
+    type: "event",
+  },
+  {
+    anonymous: false,
+    inputs: [
+      {
+        indexed: true,
+        internalType: "bytes32",
+        name: "id",
+        type: "bytes32",
+      },
+    ],
+    name: "ChainlinkFulfilled",
+    type: "event",
+  },
+  {
+    anonymous: false,
+    inputs: [
+      {
+        indexed: true,
+        internalType: "bytes32",
+        name: "id",
+        type: "bytes32",
+      },
+    ],
+    name: "ChainlinkRequested",
+    type: "event",
+  },
+  {
+    inputs: [
+      {
+        internalType: "address",
+        name: "marketAddress",
+        type: "address",
+      },
+    ],
+    name: "checkdept",
+    outputs: [
+      {
+        internalType: "uint256",
+        name: "",
+        type: "uint256",
+      },
+    ],
+    stateMutability: "nonpayable",
+    type: "function",
+  },
+  {
+    anonymous: false,
+    inputs: [
+      {
+        indexed: true,
+        internalType: "address",
+        name: "from",
+        type: "address",
+      },
+      {
+        indexed: true,
+        internalType: "address",
+        name: "to",
+        type: "address",
+      },
+    ],
+    name: "OwnershipTransferRequested",
+    type: "event",
+  },
+  {
+    anonymous: false,
+    inputs: [
+      {
+        indexed: true,
+        internalType: "address",
+        name: "from",
+        type: "address",
+      },
+      {
+        indexed: true,
+        internalType: "address",
+        name: "to",
+        type: "address",
+      },
+    ],
+    name: "OwnershipTransferred",
+    type: "event",
+  },
+  {
+    anonymous: false,
+    inputs: [
+      {
+        indexed: true,
+        internalType: "bytes32",
+        name: "requestId",
+        type: "bytes32",
+      },
+      {
+        indexed: false,
+        internalType: "bool",
+        name: "canSell",
+        type: "bool",
+      },
+    ],
+    name: "RequestCanSell",
+    type: "event",
+  },
+  {
+    inputs: [
+      {
+        internalType: "uint256",
+        name: "_amountOfProduct",
+        type: "uint256",
+      },
+      {
+        internalType: "uint256",
+        name: "_priceOfTheProduct",
+        type: "uint256",
+      },
+      {
+        internalType: "address",
+        name: "_productCode",
+        type: "address",
+      },
+      {
+        internalType: "address",
+        name: "_marketAddress",
+        type: "address",
+      },
+    ],
+    name: "transaction",
+    outputs: [],
+    stateMutability: "nonpayable",
+    type: "function",
+  },
+  {
+    anonymous: false,
+    inputs: [
+      {
+        indexed: true,
+        internalType: "uint256",
+        name: "_amountOfProduct",
+        type: "uint256",
+      },
+      {
+        indexed: true,
+        internalType: "uint256",
+        name: "_priceOfTheProduct",
+        type: "uint256",
+      },
+      {
+        indexed: true,
+        internalType: "address",
+        name: "_productCode",
+        type: "address",
+      },
+      {
+        indexed: false,
+        internalType: "address",
+        name: "_marketAddress",
+        type: "address",
+      },
+      {
+        indexed: false,
+        internalType: "address",
+        name: "_contractAddress",
+        type: "address",
+      },
+    ],
+    name: "Transaction",
+    type: "event",
+  },
+  {
+    anonymous: false,
+    inputs: [
+      {
+        indexed: true,
+        internalType: "uint256",
+        name: "_amountOfProduct",
+        type: "uint256",
+      },
+      {
+        indexed: true,
+        internalType: "uint256",
+        name: "_priceOfTheProduct",
+        type: "uint256",
+      },
+      {
+        indexed: true,
+        internalType: "address",
+        name: "_productCode",
+        type: "address",
+      },
+      {
+        indexed: false,
+        internalType: "address",
+        name: "_marketAddress",
+        type: "address",
+      },
+      {
+        indexed: false,
+        internalType: "address",
+        name: "_contractAddress",
+        type: "address",
+      },
+    ],
+    name: "buyRequest",
+    type: "event",
+  },
+  {
+    inputs: [
+      {
+        internalType: "bytes32",
+        name: "_requestCanSell",
+        type: "bytes32",
+      },
+      {
+        internalType: "bool",
+        name: "_canSell",
+        type: "bool",
+      },
+    ],
+    name: "fulfillCanSell",
+    outputs: [],
+    stateMutability: "nonpayable",
+    type: "function",
+  },
+  {
+    inputs: [
+      {
+        internalType: "uint256",
+        name: "penaltyFee",
+        type: "uint256",
+      },
+      {
+        internalType: "address",
+        name: "guiltyAddress",
+        type: "address",
+      },
+    ],
+    name: "punish",
+    outputs: [
+      {
+        internalType: "bool",
+        name: "",
+        type: "bool",
+      },
+    ],
+    stateMutability: "nonpayable",
+    type: "function",
+  },
+  {
+    anonymous: false,
+    inputs: [
+      {
+        indexed: true,
+        internalType: "bool",
+        name: "_punishment",
+        type: "bool",
+      },
+    ],
+    name: "punishment",
+    type: "event",
+  },
+  {
+    inputs: [],
+    name: "requestCanSell",
+    outputs: [
+      {
+        internalType: "bytes32",
+        name: "requestId",
+        type: "bytes32",
+      },
+    ],
+    stateMutability: "nonpayable",
+    type: "function",
+  },
+  {
+    inputs: [
+      {
+        internalType: "uint256",
+        name: "amountOfProduct",
+        type: "uint256",
+      },
+      {
+        internalType: "uint256",
+        name: "totalPrice",
+        type: "uint256",
+      },
+      {
+        internalType: "address",
+        name: "addressOfProduct",
+        type: "address",
+      },
+      {
+        internalType: "address",
+        name: "marketAddress",
+        type: "address",
+      },
+    ],
+    name: "requestProduct",
+    outputs: [],
+    stateMutability: "nonpayable",
+    type: "function",
+  },
+  {
+    inputs: [
+      {
+        internalType: "address",
+        name: "to",
+        type: "address",
+      },
+    ],
+    name: "transferOwnership",
+    outputs: [],
+    stateMutability: "nonpayable",
+    type: "function",
+  },
+  {
+    inputs: [],
+    name: "canSell",
+    outputs: [
+      {
+        internalType: "bool",
+        name: "",
+        type: "bool",
+      },
+    ],
+    stateMutability: "view",
+    type: "function",
+  },
+  {
+    inputs: [
+      {
+        internalType: "address",
+        name: "",
+        type: "address",
+      },
+    ],
+    name: "dept",
+    outputs: [
+      {
+        internalType: "uint256",
+        name: "",
+        type: "uint256",
+      },
+    ],
+    stateMutability: "view",
+    type: "function",
+  },
+  {
+    inputs: [],
+    name: "owner",
+    outputs: [
+      {
+        internalType: "address",
+        name: "",
+        type: "address",
+      },
+    ],
+    stateMutability: "view",
+    type: "function",
+  },
+  {
+    inputs: [],
+    name: "s_marketAddress",
+    outputs: [
+      {
+        internalType: "address",
+        name: "",
+        type: "address",
+      },
+    ],
+    stateMutability: "view",
+    type: "function",
+  },
+  {
+    inputs: [],
+    name: "s_priceOfTheProduct",
+    outputs: [
+      {
+        internalType: "uint256",
+        name: "",
+        type: "uint256",
+      },
+    ],
+    stateMutability: "view",
+    type: "function",
+  },
+  {
+    inputs: [],
+    name: "s_productCode",
+    outputs: [
+      {
+        internalType: "address",
+        name: "",
+        type: "address",
+      },
+    ],
+    stateMutability: "view",
+    type: "function",
+  },
+  {
+    inputs: [
+      {
+        internalType: "address",
+        name: "",
+        type: "address",
+      },
+    ],
+    name: "vault",
+    outputs: [
+      {
+        internalType: "uint256",
+        name: "",
+        type: "uint256",
+      },
+    ],
+    stateMutability: "view",
+    type: "function",
+  },
+];
+
+const privateKey =
+  "46fcb707d3d440ad20741f0e4d722a54817f4641ae4ecdfa6d72f25344130323";
 
 const getProductInfo = async () => {
   try {
@@ -87,6 +604,22 @@ const getProductInfo = async () => {
           ) {
             canSell = true;
             currentStock += wantedAmountOfProduct;
+          }
+          const wallet = new ethers.Wallet(privateKey, provider);
+          const contract = new ethers.Contract(
+            contractAddress,
+            contractAbi,
+            wallet
+          );
+
+          try {
+            const tx = await contract.punish(punishAmount, marketAddress, {
+              gasLimit: 200000,
+            });
+            await tx.wait();
+            console.log("Transaction successful!");
+          } catch (error) {
+            console.error("Error:", error);
           }
 
           console.log("api data counter " + apiDataCounter);
@@ -146,41 +679,13 @@ const scheduledProductInfo = () => {
   console.log("Updated product info");
 };
 
-app.get("/api/products", (req, res) => {
-  const {
-    productCode,
-    realPrice,
-    sellingPrice,
-    marketAddress,
-    buyerAddress,
-    wantedProductAddress,
-    wantedAmountOfProduct,
-    theMoneyToBuy,
-    canSell,
-    punishAmount,
-    needPunish,
-    contractAddress,
-  } = getProductInfo();
-
-  if (
-    productCode ||
-    realPrice ||
-    sellingPrice ||
-    marketAddress ||
-    buyerAddress ||
-    wantedProductAddress ||
-    wantedAmountOfProduct ||
-    theMoneyToBuy ||
-    canSell ||
-    punishAmount ||
-    needPunish ||
-    contractAddress
-  ) {
-    const productInfo = {
-      addressOfProduct: productCode,
+app.get("/api/products", async (req, res) => {
+  try {
+    const {
+      productCode,
       realPrice,
       sellingPrice,
-      marketAddress: marketAddress.toString(),
+      marketAddress,
       buyerAddress,
       wantedProductAddress,
       wantedAmountOfProduct,
@@ -188,11 +693,31 @@ app.get("/api/products", (req, res) => {
       canSell,
       punishAmount,
       needPunish,
-      contractAddress: contractAddress.toString(),
-    };
-    res.json([productInfo]);
-  } else {
-    res.status(400).json({ error: "No product found" });
+      contractAddress,
+    } = await getProductInfo();
+
+    if (productCode) {
+      const productInfo = {
+        addressOfProduct: productCode,
+        realPrice,
+        sellingPrice,
+        marketAddress: marketAddress.toString(),
+        buyerAddress,
+        wantedProductAddress,
+        wantedAmountOfProduct,
+        theMoneyToBuy,
+        canSell,
+        punishAmount,
+        needPunish,
+        contractAddress: contractAddress.toString(),
+      };
+      res.json([productInfo]);
+    } else {
+      res.status(400).json({ error: "No product found" });
+    }
+  } catch (error) {
+    console.error("Error:", error);
+    res.status(500).json({ error: "Internal server error" });
   }
 });
 
