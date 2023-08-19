@@ -5,26 +5,26 @@ from web3 import Web3
 app = Flask(__name__)
 
 hashMapOfProducts = {
-    "0xf39fd6e51aad88f6f4ce6ab8827279cfffb92266": 1,
-    "0xAnotherProductAddressHere": 2,
-    "0xAnotherProductAddressHere2": 3,
+    "0xf39fd6e51aad88f6f4ce6ab8827279cfffb92266": 10,
+    "0x9d70a76e6f5e5da7950585a59522b2f8efb49f66": 20,
+    "0x63a6f8e70f1e666dd6afe2e51652370772a7b2d6": 30,
 }
 
 marketAddresses = [
-    ["0x7EFd0B777026A9c42757d92A3f79361467372435", "0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266", 40, 10],
-    ["0xNewMarketAddress1Here", "0xNewProductAddress1Here", 50, 15],
-    ["0xNewMarketAddress2Here", "0xNewProductAddress2Here", 60, 20]
+    ["0x7efd0b777026a9c42757d92a3f79361467372435", "0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266", 40, 10,100],
+    ["0x5b38da6a701c568545dcfcb03fcb875f56beddc4", "0x9d70a76e6f5e5da7950585a59522b2f8efb49f66", 50, 15,90],
+    ["0x4b20993bc481177ec7e8f571cecae8a9e22c02db", "0x63a6f8e70f1e666dd6afe2e51652370772a7b2d6", 60, 20,80]
 ]
-#    marketAddress           productAddress                totalAmountInHand  #Punish Amount
+#    marketAddress           productAddress                totalAmountInHand  #Punish Amount #stock limit
 
-exampleHashMap = {address[0]: [address[1], address[2],address[3]] for address in marketAddresses}
+exampleHashMap = {address[0]: [address[1], address[2],address[3],address[4]] for address in marketAddresses}
 
 
-#0x7EFd0B777026A9c42757d92A3f79361467372435 -> benim adres, market adres
+#0x7efd0b777026a9c42757d92a3f79361467372435 -> benim adres, market adres
 # 0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266 -bu  urun
 # 0x37E64E8d534A174bF4b7aBA5943dD99cC1a47202
-# 0x9D70A76E6F5e5dA7950585a59522b2F8eFb49f66
-# 0x63a6f8E70f1E666DD6afE2e51652370772a7b2D6
+# 0x9d70a76e6f5e5da7950585a59522b2f8efb49f66
+# 0x63a6f8e70f1e666dd6afe2e51652370772a7b2d6
 # 0x45A3e8C1a54c8Ae48B21Dd8f98c9FEEa0f70DB3E
 # 0x791AF412A222d334C2A3c61C9cE8C1EeA5fc61F2
 # 0x2bEf0A9381C0951A68980eA242b8f5F0F0cA78a3
@@ -32,11 +32,11 @@ exampleHashMap = {address[0]: [address[1], address[2],address[3]] for address in
 # 0x17a2E8400e2CA602F8453E214b8a813ca69E8fF4
 # 0xf9Cf6A857F6faA8e7600fB0B6fC45e5c28d6b458
 
-api_data_counter = 0
 web3 = Web3(Web3.HTTPProvider('https://eth-sepolia.g.alchemy.com/v2/AsRLVXZLZMPKrruB1nFRRSGfSquRWJtA'))
-url = "https://api-sepolia.etherscan.io/api?module=logs&action=getLogs&fromBlock=0&toBlock=latest&address=0xdcC4796AFD0c1F5f3adF07eD4008462E70d4b948&api_key=9MWB7ZQYSHVYVE7C85IPMSQUVR1CAYUTWN"
+url = "https://api-sepolia.etherscan.io/api?module=logs&action=getLogs&fromBlock=0&toBlock=latest&address=0xF756bdB220986167496F6995CC64287AF4648DEa&api_key=9MWB7ZQYSHVYVE7C85IPMSQUVR1CAYUTWN"
 private_key = "46fcb707d3d440ad20741f0e4d722a54817f4641ae4ecdfa6d72f25344130323"
 account = web3.eth.account.from_key(private_key)
+
 
 contract_abi =[
 	{
@@ -546,7 +546,9 @@ contract_abi =[
 		"type": "function"
 	}
 ]
-
+response = requests.get(url)
+result = response.json().get('result')
+api_data_counter = len(result)-1
 #Kendimize notlar:
 #Counter eklenerek topics arraylerinin iclerindeki hardcode giderilebilir.
 #örnek sayıları arttırılmalı.
@@ -556,6 +558,7 @@ def get_product_info():
     result = response.json().get('result')
     
     if result and len(result) > api_data_counter:
+        
         result_item = result[api_data_counter]
         if isinstance(result_item, dict):
             topics = result_item.get('topics')
@@ -565,6 +568,7 @@ def get_product_info():
         api_data_counter = len(result)-1
         print(len(topics))
         if len(topics) != 2:
+            
             #topicin boyutu 2 ise tum bu satırları atlayıp yeni api data bulmaya gec
             contractAddress = result[api_data_counter]['address']
             
@@ -583,11 +587,12 @@ def get_product_info():
             #bu nedir bulunmalı
             theMoneyToBuy = int(topics2[2], 16) # Extracting money to buy and converting from hex to int
             
-            dataOfMarket = exampleHashMap.get("0x7EFd0B777026A9c42757d92A3f79361467372435")
-            codeOfProductFromMarket, currentStock, punishAmount = dataOfMarket[0], dataOfMarket[1], dataOfMarket[2]
+            dataOfMarket = exampleHashMap.get("0x"+marketAddress.lower())
+            codeOfProductFromMarket, currentStock, punishAmount,stockLimit = dataOfMarket[0], dataOfMarket[1], dataOfMarket[2] , dataOfMarket[3]
             if realPrice < sellingPrice:
                 needPunish = True
                 punishAmount = punishAmount +10
+                currentStock -= int(topics[1], 16)
                 
             if needPunish == False :
                 #bu gercek depoda dusulmeli
@@ -610,14 +615,27 @@ def get_product_info():
             canSell = False
         
             print("api data counter " + str(api_data_counter) +"\n contract Address " + str(contractAddress) + "\n selling price" + str(sellingPrice) + "\n product code" + str(productCode) + "\n real price " + str(realPrice) + "\n market address " + str(marketAddress) + "\n buyer address " + str(buyerAddress) + "\n wanted product address " + str(wantedProductAddress) + "\n wanted amount of product " + str(wantedAmountOfProduct) + "\n the money to buy " + str(theMoneyToBuy) + "\n code of product from market " + str(codeOfProductFromMarket) + "\n current stock " + str(currentStock) + "\n punish amount " + str(punishAmount) + "\n need punish " + str(needPunish) + "\n contract address " + str(contractAddress))
-            if currentStock >= wantedAmountOfProduct and theMoneyToBuy >= wantedAmountOfProduct* (hashMapOfProducts.get(wantedProductAddress.lower()))  and str(codeOfProductFromMarket.lower()) == str(wantedProductAddress.lower()):
+            if currentStock+wantedAmountOfProduct <= stockLimit and theMoneyToBuy >= wantedAmountOfProduct* (hashMapOfProducts.get(wantedProductAddress.lower()))  and str(codeOfProductFromMarket.lower()) == str(wantedProductAddress.lower()):
                 canSell = True
                 currentStock += wantedAmountOfProduct
+                checksum_contract_address = Web3.to_checksum_address(contractAddress)
+                contract = web3.eth.contract(address=checksum_contract_address, abi=contract_abi)
+                buyer_checksum_address = Web3.to_checksum_address(buyerAddress)
+                product_checksum_address = Web3.to_checksum_address(wantedProductAddress)
+                transactionBuy = contract.functions.buyProduct(wantedAmountOfProduct,theMoneyToBuy,product_checksum_address,buyer_checksum_address).build_transaction({
+                    'from': account.address,
+                    'nonce': web3.eth.get_transaction_count(account.address),
+                    'gas': 200000,
+                    'gasPrice': web3.to_wei('50', 'gwei')
+                })
+                signed_txn = web3.eth.account.sign_transaction(transactionBuy, private_key=private_key)
                 print("The product is available in the market")
             return productCode, realPrice, sellingPrice , marketAddress , buyerAddress , wantedProductAddress , wantedAmountOfProduct , theMoneyToBuy , canSell , punishAmount ,needPunish ,contractAddress
         else:
+           
             return (None,) * 12
-
+    
+        
 
 def scheduled_product_info():
     get_product_info()
@@ -627,7 +645,7 @@ def scheduled_product_info():
 @app.route('/api/products', methods=['GET'])
 def products():
     productCode, realPrice, sellingPrice , marketAddress,buyerAddress , wantedProductAddress , wantedAmountOfProduct , theMoneyToBuy,canSell, punishAmount,needPunish , contractAddress = get_product_info() # Notice the updated return values
-    print(productCode, realPrice, sellingPrice)
+    
     if productCode or realPrice or sellingPrice or marketAddress or buyerAddress or wantedProductAddress or wantedAmountOfProduct or theMoneyToBuy or canSell or punishAmount or needPunish or contractAddress:
         product_info = {
             "addressOfProduct": productCode,
@@ -647,6 +665,7 @@ def products():
         }
         return jsonify([product_info])
     else:
+        print("Last transaction is punish. Waiting for new transaction")
         return jsonify({"error": "No product found"}), 400
 
 scheduler = BackgroundScheduler(daemon=True)
