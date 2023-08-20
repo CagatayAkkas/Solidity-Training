@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="tr">
+  <head>
+    <title>Main</title>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link
+      rel="stylesheet"
+      href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css"
+    />
+    <style>
+      /* Ortala "Chain Prices" Başlığı ve Stili */
+      a {
+        text-decoration: none;
+      }
+      .centered {
+        text-align: center;
+        margin-top: 40px;
+        margin-bottom: 100px;
+        font-size: 40px;
+        color: #333;
+      }
+
+      /* Seçenekler Arası Boşluk */
+      .option-container {
+        margin-top: 20px;
+        text-align: center;
+      }
+
+      /* Buy ve Punish Butonlarının Stili */
+      .option-card.active {
+        background-color: #007bff;
+        color: #fff;
+      }
+
+      /* Buy ve Punish Butonlarının Siyah Rengi */
+      .nav-pills .nav-link.option-card {
+        color: black;
+      }
+
+      /* Seçili Butonların Rengi */
+      .nav-pills .nav-link.option-card.active {
+        background-color: black;
+        color: white;
+      }
+    </style>
+  </head>
+
+  <body>
+    <div class="container">
+      <a href="main.html" style="text-decoration: none">
+        <h2 class="mt-4 centered">Chain Prices</h2>
+      </a>
+      <ul
+        class="nav nav-pills justify-content-center option-container"
+        id="option-pills"
+      >
+        <li class="nav-item">
+          <a
+            class="nav-link active option-card"
+            data-toggle="pill"
+            href="#buy"
+            onclick="setNavigation('Buy')"
+            >Buy</a
+          >
+        </li>
+        <li class="nav-item">
+          <a
+            class="nav-link option-card"
+            data-toggle="pill"
+            href="#sell"
+            onclick="setNavigation('Sell')"
+            >Sell</a
+          >
+        </li>
+        <li class="nav-item">
+          <a
+            class="nav-link option-card"
+            data-toggle="pill"
+            href="#punish"
+            onclick="setNavigation('Punish')"
+            >Money</a
+          >
+        </li>
+        <li class="nav-item">
+          <a class="nav-link option-card" href="./transaction.html"
+            >Transaction</a
+          >
+        </li>
+      </ul>
+      <div class="tab-content">
+        <div class="tab-pane fade show active" id="buy">
+          <!-- Buy içeriği -->
+        </div>
+        <div class="tab-pane fade" id="sell">
+          <!-- Sell içeriği -->
+        </div>
+        <div class="tab-pane fade" id="punish">
+          <!-- Punish içeriği -->
+        </div>
+        <div class="tab-pane fade" id="transaction">
+          <!-- Transaction içeriği -->
+        </div>
+      </div>
+      <div class="row mt-4">
+        <div class="col">
+          <input
+            type="text"
+            class="form-control"
+            id="walletAddress"
+            placeholder="Cüzdan Adresi"
+          />
+        </div>
+      </div>
+      <div class="row mt-4">
+        <div class="col">
+          <button class="btn btn-primary" onclick="navigate()">Confirm</button>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      var selectedNavigation = "Buy";
+
+      function setNavigation(option) {
+        selectedNavigation = option;
+
+        // Tüm butonları inaktif hale getir
+        var optionCards = document.querySelectorAll(".option-card");
+        optionCards.forEach(function (card) {
+          card.classList.remove("active");
+        });
+
+        // Seçilen butonu aktif hale getir
+        var selectedCard = document.querySelector(
+          '.option-card[data-toggle="pill"][href="#' +
+            option.toLowerCase() +
+            '"]'
+        );
+        selectedCard.classList.add("active");
+      }
+
+      function navigate() {
+        var walletAddress = document.getElementById("walletAddress").value;
+        if (selectedNavigation !== "" && walletAddress !== "") {
+          var destination = selectedNavigation.toLowerCase() + ".html";
+          // Yönlendirme işlemi
+          window.location.href =
+            destination + "?wallet=" + encodeURIComponent(walletAddress);
+        } else {
+          // Input boş ise uyarı ver
+          alert("Please check inputs.");
+        }
+      }
+    </script>
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.1/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/js/bootstrap.min.js"></script>
+  </body>
+</html>

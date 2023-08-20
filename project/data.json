@@ -1,17 +1,32 @@
 [
-  {
-    "addressOfProduct": "0xf39fd6e51aad88f6f4ce6ab8827279cfffb92266",
-    "realPrice": 5,
-    "sellingPrice": 3,
-    "marketAddress": "7efd0b777026a9c42757d92a3f79361467372435",
-    "buyerAddress": "7efd0b777026a9c42757d92a3f79361467372435",
-    "wantedProductAddress": "0xf39fd6e51aad88f6f4ce6ab8827279cfffb92266",
-    "wantedAmountOfProduct": 1,
-    "theMoneyToBuy": 3,
-    "canSell": false,
-    "punishAmount": 10,
-    "needPunish": true,
-    "contractAddress": "0x0068cf9f4e9a003a6858caa5a115b25e8b209d22",
-    "isTransaction": true
-  }
+    {
+        "addressOfProduct": "0xf39fd6e51aad88f6f4ce6ab8827279cfffb92266",
+        "realPrice": 5,
+        "sellingPrice": 3,
+        "marketAddress": "7efd0b777026a9c42757d92a3f79361467372435",
+        "buyerAddress": "7efd0b777026a9c42757d92a3f79361467372435",
+        "wantedProductAddress": "0xf39fd6e51aad88f6f4ce6ab8827279cfffb92266",
+        "wantedAmountOfProduct": 1,
+        "theMoneyToBuy": 3,
+        "canSell": false,
+        "punishAmount": 10,
+        "needPunish": true,
+        "contractAddress": "0x0068cf9f4e9a003a6858caa5a115b25e8b209d22",
+        "isTransaction": true
+    },
+    {
+        "addressOfProduct": "0xf39fd6e51aad88f6f4ce6ab8827279cfffb92266",
+        "realPrice": 5,
+        "sellingPrice": 3,
+        "marketAddress": "7efd0b777026a9c42757d92a3f79361467372435",
+        "buyerAddress": "7efd0b777026a9c42757d92a3f79361467372435",
+        "wantedProductAddress": "0xf39fd6e51aad88f6f4ce6ab8827279cfffb92266",
+        "wantedAmountOfProduct": 1,
+        "theMoneyToBuy": 3,
+        "canSell": false,
+        "punishAmount": 10,
+        "needPunish": false,
+        "contractAddress": "0x0068cf9f4e9a003a6858caa5a115b25e8b209d22",
+        "isTransaction": true
+    }
 ]

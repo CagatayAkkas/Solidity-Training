@@ -51,7 +51,7 @@
     <!-- Load the JavaScript dynamically -->
     <script>
       const script = document.createElement("script");
-      script.src = "sendDataToTable.js";
+
       script.async = true;
       document.body.appendChild(script);
     </script>

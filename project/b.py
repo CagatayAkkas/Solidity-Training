@@ -1,6 +1,5 @@
 from flask import Flask, jsonify
 import requests
-import json
 from apscheduler.schedulers.background import BackgroundScheduler
 from web3 import Web3
 app = Flask(__name__)
@@ -640,25 +639,6 @@ def get_product_info():
                 print("PUNİSHENT SENT")
                 
             canSell = False
-            data = {"addressOfProduct": productCode,
-            "realPrice": realPrice,
-            "sellingPrice": sellingPrice,
-            "marketAddress": str(marketAddress),
-            "buyerAddress": buyerAddress,
-            "wantedProductAddress": wantedProductAddress,
-            "wantedAmountOfProduct": wantedAmountOfProduct,
-            "theMoneyToBuy": theMoneyToBuy,
-            "canSell": canSell,
-            "punishAmount": punishAmount,
-            "needPunish": needPunish,
-            "contractAddress": str(contractAddress),
-			"isTransaction" : isTransaction}
-            with open('data.json', 'r') as file:
-                existing_data = json.load(file)
-            existing_data.append(data)
-            with open ('data.json', 'w') as file:
-                json.dump(existing_data, file, indent=4)			
-                
         
             print("api data counter " + str(api_data_counter) +"\n contract Address " + str(contractAddress) + "\n selling price" + str(sellingPrice) + "\n product code" + str(productCode) + "\n real price " + str(realPrice) + "\n market address " + str(marketAddress) + "\n buyer address " + str(buyerAddress) + "\n wanted product address " + str(wantedProductAddress) + "\n wanted amount of product " + str(wantedAmountOfProduct) + "\n the money to buy " + str(theMoneyToBuy) + "\n code of product from market " + str(codeOfProductFromMarket) + "\n current stock " + str(currentStock) + "\n punish amount " + str(punishAmount) + "\n need punish " + str(needPunish) + "\n contract address " + str(contractAddress) + "\n is transaction " + str(isTransaction))
             if currentStock+wantedAmountOfProduct <= stockLimit and isTransaction==False and  theMoneyToBuy >= wantedAmountOfProduct* (hashMapOfProducts.get(wantedProductAddress.lower()))  and str(codeOfProductFromMarket.lower()) == str(wantedProductAddress.lower()):
@@ -720,7 +700,7 @@ def products():
 
 scheduler = BackgroundScheduler(daemon=True)
 # Schedule the job to update the product info every 7 seconds
-scheduler.add_job(scheduled_product_info, 'interval', seconds=10)
+scheduler.add_job(scheduled_product_info, 'interval', seconds=15)
 scheduler.start()
 
 

@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="tr">
+  <head>
+    <title>Transaction Table</title>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link
+      rel="stylesheet"
+      href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css"
+    />
+    <style>
+      .scrollable-cell {
+        overflow: auto;
+        max-height: 100px;
+      }
+      .centered {
+        text-align: center;
+        margin-top: 40px;
+        margin-bottom: 100px;
+        font-size: 40px;
+        color: #333;
+      }
+      a {
+        text-decoration: none;
+      }
+    </style>
+  </head>
+
+  <body>
+    <a href="main.html" style="text-decoration: none"
+      ><h2 class="mt-4 centered">Chain Prices</h2></a
+    >
+    <div class="container">
+      <h2>Transaction Table</h2>
+      <a class="contractAddress" href=""><h5 id="address"></h5></a>
+      <table class="table">
+        <thead>
+          <tr>
+            <th>Market Address</th>
+            <th>Product Code</th>
+            <th>Product Price</th>
+            <th>Punishment</th>
+          </tr>
+        </thead>
+        <tbody id="transactionTableBody">
+          <!-- Transaction data will be dynamically added here -->
+        </tbody>
+      </table>
+    </div>
+
+    <script src="../js/transaction.js"></script>
+  </body>
+</html>
