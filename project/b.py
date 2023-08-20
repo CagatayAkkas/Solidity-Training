@@ -1,19 +1,20 @@
 from flask import Flask, jsonify
 import requests
+import json
 from apscheduler.schedulers.background import BackgroundScheduler
 from web3 import Web3
 app = Flask(__name__)
 
 hashMapOfProducts = {
-    "0xf39fd6e51aad88f6f4ce6ab8827279cfffb92266": 10,
-    "0x9d70a76e6f5e5da7950585a59522b2f8efb49f66": 20,
-    "0x63a6f8e70f1e666dd6afe2e51652370772a7b2d6": 30,
+    "0xf39fd6e51aad88f6f4ce6ab8827279cfffb92266": 5,
+    "0x9d70a76e6f5e5da7950585a59522b2f8efb49f66": 10,
+    "0x63a6f8e70f1e666dd6afe2e51652370772a7b2d6": 15,
 }
 
 marketAddresses = [
-    ["0x7efd0b777026a9c42757d92a3f79361467372435", "0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266", 40, 10,100],
-    ["0x5b38da6a701c568545dcfcb03fcb875f56beddc4", "0x9d70a76e6f5e5da7950585a59522b2f8efb49f66", 50, 15,90],
-    ["0x4b20993bc481177ec7e8f571cecae8a9e22c02db", "0x63a6f8e70f1e666dd6afe2e51652370772a7b2d6", 60, 20,80]
+    ["0x7efd0b777026a9c42757d92a3f79361467372435", "0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266", 10, 10,20],
+    ["0x5b38da6a701c568545dcfcb03fcb875f56beddc4", "0x9d70a76e6f5e5da7950585a59522b2f8efb49f66", 20, 15,30],
+    ["0x4b20993bc481177ec7e8f571cecae8a9e22c02db", "0x63a6f8e70f1e666dd6afe2e51652370772a7b2d6", 30, 20,40]
 ]
 #    marketAddress           productAddress                totalAmountInHand  #Punish Amount #stock limit
 
@@ -33,12 +34,12 @@ exampleHashMap = {address[0]: [address[1], address[2],address[3],address[4]] for
 # 0xf9Cf6A857F6faA8e7600fB0B6fC45e5c28d6b458
 
 web3 = Web3(Web3.HTTPProvider('https://eth-sepolia.g.alchemy.com/v2/AsRLVXZLZMPKrruB1nFRRSGfSquRWJtA'))
-url = "https://api-sepolia.etherscan.io/api?module=logs&action=getLogs&fromBlock=0&toBlock=latest&address=0xF756bdB220986167496F6995CC64287AF4648DEa&api_key=9MWB7ZQYSHVYVE7C85IPMSQUVR1CAYUTWN"
+url = "https://api-sepolia.etherscan.io/api?module=logs&action=getLogs&fromBlock=0&toBlock=latest&address=0x0068Cf9f4e9A003a6858Caa5a115B25E8B209d22&api_key=9MWB7ZQYSHVYVE7C85IPMSQUVR1CAYUTWN"
 private_key = "46fcb707d3d440ad20741f0e4d722a54817f4641ae4ecdfa6d72f25344130323"
 account = web3.eth.account.from_key(private_key)
 
 
-contract_abi =[
+contract_abi = [
 	{
 		"inputs": [],
 		"name": "acceptOwnership",
@@ -284,6 +285,12 @@ contract_abi =[
 				"internalType": "address",
 				"name": "_contractAddress",
 				"type": "address"
+			},
+			{
+				"indexed": False,
+				"internalType": "bool",
+				"name": "isTransaction",
+				"type": "bool"
 			}
 		],
 		"name": "Transaction",
@@ -321,6 +328,12 @@ contract_abi =[
 				"internalType": "address",
 				"name": "_contractAddress",
 				"type": "address"
+			},
+			{
+				"indexed": False,
+				"internalType": "bool",
+				"name": "isTransaction",
+				"type": "bool"
 			}
 		],
 		"name": "buyRequest",
@@ -549,22 +562,31 @@ contract_abi =[
 response = requests.get(url)
 result = response.json().get('result')
 api_data_counter = len(result)-1
+oldTimeStamp= ""
+timeStamp = ""
 #Kendimize notlar:
 #Counter eklenerek topics arraylerinin iclerindeki hardcode giderilebilir.
 #örnek sayıları arttırılmalı.
 def get_product_info():
     global api_data_counter 
+    global timeStamp
+    global oldTimeStamp
     response = requests.get(url)
     result = response.json().get('result')
+    index = int(len(result)-1)
+    timeStamp = result[index]['timeStamp']
+    print("time stamp is" + timeStamp)
     
-    if result and len(result) > api_data_counter:
+    if result and len(result) > api_data_counter and oldTimeStamp != timeStamp:
         
-        result_item = result[api_data_counter]
+        print(len(result))
+        oldTimeStamp=timeStamp
+        result_item = result[index]
         if isinstance(result_item, dict):
             topics = result_item.get('topics')
         else:
             print("Unexpected result item:", result_item)
-            return (None,) * 12
+            return (None,) * 13
         api_data_counter = len(result)-1
         print(len(topics))
         if len(topics) != 2:
@@ -582,6 +604,9 @@ def get_product_info():
             marketAddress = result[api_data_counter]['data'][26:66]  # Extracting the address, skipping the first 26 characters (24 zeros + 0x)
             topics2 = result[api_data_counter].get('topics')
             buyerAddress = result[api_data_counter]['data'][26:66]  # Extracting buyer address
+            isTransaction = result[api_data_counter]["data"][-1]
+            isTransaction = True if isTransaction == "1" else False
+            print(isTransaction)
             wantedProductAddress = "0x" + topics2[3][-40:]  # Extracting wanted product address
             wantedAmountOfProduct = int(topics2[1], 16)  # Converting hex to int for wanted amount of product
             #bu nedir bulunmalı
@@ -589,7 +614,9 @@ def get_product_info():
             
             dataOfMarket = exampleHashMap.get("0x"+marketAddress.lower())
             codeOfProductFromMarket, currentStock, punishAmount,stockLimit = dataOfMarket[0], dataOfMarket[1], dataOfMarket[2] , dataOfMarket[3]
-            if realPrice < sellingPrice:
+            
+                
+            if realPrice < sellingPrice and isTransaction==True:
                 needPunish = True
                 punishAmount = punishAmount +10
                 currentStock -= int(topics[1], 16)
@@ -613,28 +640,51 @@ def get_product_info():
                 print("PUNİSHENT SENT")
                 
             canSell = False
+            data = {"addressOfProduct": productCode,
+            "realPrice": realPrice,
+            "sellingPrice": sellingPrice,
+            "marketAddress": str(marketAddress),
+            "buyerAddress": buyerAddress,
+            "wantedProductAddress": wantedProductAddress,
+            "wantedAmountOfProduct": wantedAmountOfProduct,
+            "theMoneyToBuy": theMoneyToBuy,
+            "canSell": canSell,
+            "punishAmount": punishAmount,
+            "needPunish": needPunish,
+            "contractAddress": str(contractAddress),
+			"isTransaction" : isTransaction}
+            with open('data.json', 'r') as file:
+                existing_data = json.load(file)
+            existing_data.append(data)
+            with open ('data.json', 'w') as file:
+                json.dump(existing_data, file, indent=4)			
+                
         
-            print("api data counter " + str(api_data_counter) +"\n contract Address " + str(contractAddress) + "\n selling price" + str(sellingPrice) + "\n product code" + str(productCode) + "\n real price " + str(realPrice) + "\n market address " + str(marketAddress) + "\n buyer address " + str(buyerAddress) + "\n wanted product address " + str(wantedProductAddress) + "\n wanted amount of product " + str(wantedAmountOfProduct) + "\n the money to buy " + str(theMoneyToBuy) + "\n code of product from market " + str(codeOfProductFromMarket) + "\n current stock " + str(currentStock) + "\n punish amount " + str(punishAmount) + "\n need punish " + str(needPunish) + "\n contract address " + str(contractAddress))
-            if currentStock+wantedAmountOfProduct <= stockLimit and theMoneyToBuy >= wantedAmountOfProduct* (hashMapOfProducts.get(wantedProductAddress.lower()))  and str(codeOfProductFromMarket.lower()) == str(wantedProductAddress.lower()):
+            print("api data counter " + str(api_data_counter) +"\n contract Address " + str(contractAddress) + "\n selling price" + str(sellingPrice) + "\n product code" + str(productCode) + "\n real price " + str(realPrice) + "\n market address " + str(marketAddress) + "\n buyer address " + str(buyerAddress) + "\n wanted product address " + str(wantedProductAddress) + "\n wanted amount of product " + str(wantedAmountOfProduct) + "\n the money to buy " + str(theMoneyToBuy) + "\n code of product from market " + str(codeOfProductFromMarket) + "\n current stock " + str(currentStock) + "\n punish amount " + str(punishAmount) + "\n need punish " + str(needPunish) + "\n contract address " + str(contractAddress) + "\n is transaction " + str(isTransaction))
+            if currentStock+wantedAmountOfProduct <= stockLimit and isTransaction==False and  theMoneyToBuy >= wantedAmountOfProduct* (hashMapOfProducts.get(wantedProductAddress.lower()))  and str(codeOfProductFromMarket.lower()) == str(wantedProductAddress.lower()):
                 canSell = True
+                print("I AM MAKİNG THE TRANSACTİON OF BUYY")
                 currentStock += wantedAmountOfProduct
                 checksum_contract_address = Web3.to_checksum_address(contractAddress)
                 contract = web3.eth.contract(address=checksum_contract_address, abi=contract_abi)
                 buyer_checksum_address = Web3.to_checksum_address(buyerAddress)
                 product_checksum_address = Web3.to_checksum_address(wantedProductAddress)
+                #the money to buy degil onu kontrol ettigimiz deger buyProducta gonderilmeli
                 transactionBuy = contract.functions.buyProduct(wantedAmountOfProduct,theMoneyToBuy,product_checksum_address,buyer_checksum_address).build_transaction({
                     'from': account.address,
                     'nonce': web3.eth.get_transaction_count(account.address),
                     'gas': 200000,
                     'gasPrice': web3.to_wei('50', 'gwei')
                 })
-                signed_txn = web3.eth.account.sign_transaction(transactionBuy, private_key=private_key)
+                signed_txn2 = web3.eth.account.sign_transaction(transactionBuy, private_key=private_key)
+                transaction_hash = web3.eth.send_raw_transaction(signed_txn2.rawTransaction)
                 print("The product is available in the market")
-            return productCode, realPrice, sellingPrice , marketAddress , buyerAddress , wantedProductAddress , wantedAmountOfProduct , theMoneyToBuy , canSell , punishAmount ,needPunish ,contractAddress
+            return productCode, realPrice, sellingPrice , marketAddress , buyerAddress , wantedProductAddress , wantedAmountOfProduct , theMoneyToBuy , canSell , punishAmount ,needPunish ,contractAddress , isTransaction
         else:
            
-            return (None,) * 12
-    
+            return (None,) * 13
+    else:
+        print("Waiting for a new block")
         
 
 def scheduled_product_info():
@@ -644,9 +694,9 @@ def scheduled_product_info():
 
 @app.route('/api/products', methods=['GET'])
 def products():
-    productCode, realPrice, sellingPrice , marketAddress,buyerAddress , wantedProductAddress , wantedAmountOfProduct , theMoneyToBuy,canSell, punishAmount,needPunish , contractAddress = get_product_info() # Notice the updated return values
+    productCode, realPrice, sellingPrice , marketAddress,buyerAddress , wantedProductAddress , wantedAmountOfProduct , theMoneyToBuy,canSell, punishAmount,needPunish , contractAddress, isTransaction = get_product_info() # Notice the updated return values
     
-    if productCode or realPrice or sellingPrice or marketAddress or buyerAddress or wantedProductAddress or wantedAmountOfProduct or theMoneyToBuy or canSell or punishAmount or needPunish or contractAddress:
+    if productCode or realPrice or sellingPrice or marketAddress or buyerAddress or wantedProductAddress or wantedAmountOfProduct or theMoneyToBuy or canSell or punishAmount or needPunish or contractAddress or isTransaction:
         product_info = {
             "addressOfProduct": productCode,
             "realPrice": realPrice,
@@ -659,8 +709,8 @@ def products():
             "canSell": canSell,
             "punishAmount": punishAmount,
             "needPunish": needPunish,
-            "contractAddress": str(contractAddress)
-
+            "contractAddress": str(contractAddress),
+			"isTransaction" : isTransaction
 
         }
         return jsonify([product_info])
@@ -670,7 +720,7 @@ def products():
 
 scheduler = BackgroundScheduler(daemon=True)
 # Schedule the job to update the product info every 7 seconds
-scheduler.add_job(scheduled_product_info, 'interval', seconds=30)
+scheduler.add_job(scheduled_product_info, 'interval', seconds=10)
 scheduler.start()
 
 

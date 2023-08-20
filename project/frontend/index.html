@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>API Data Table</title>
+    <style>
+      /* Center the table on the screen */
+      body {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 100vh;
+        margin: 0;
+      }
+      table {
+        width: 80%; /* Adjust the width as needed */
+      }
+      /* Add this CSS in your HTML file or a linked stylesheet */
+      .red-row {
+        background-color: red;
+        color: white; /* Optionally, set the text color to white for better contrast */
+      }
+
+      .green-row {
+        background-color: green;
+        color: white; /* Optionally, set the text color to white for better contrast */
+      }
+    </style>
+  </head>
+  <body>
+    <table id="dataTable" border="1">
+      <thead>
+        <tr>
+          <th>Market Address</th>
+          <th>Product Address</th>
+          <th>Transaction Amount</th>
+          <!-- Remove the 4th column header -->
+        </tr>
+      </thead>
+      <tbody>
+        <!-- Rows will be dynamically added here -->
+      </tbody>
+    </table>
+
+    <button id="addRowButton">Add Row</button>
+
+    <script>
+      // Attach the addRow function to the button click event
+      document.getElementById("addRowButton").addEventListener("click", addRow);
+    </script>
+
+    <!-- Load the JavaScript dynamically -->
+    <script>
+      const script = document.createElement("script");
+      script.src = "sendDataToTable.js";
+      script.async = true;
+      document.body.appendChild(script);
+    </script>
+    <script src="browser.js"></script>
+  </body>
+</html>
