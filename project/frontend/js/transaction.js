@@ -70,6 +70,7 @@ function updateData(newData) {
     if (newItem) {
       var addressCell = newRow.insertCell(0);
       var slicedData = newItem.marketAddress;
+      var canSell = newItem.canSell;
       addressCell.className = "scrollable-cell";
       var link = document.createElement("a");
       link.href =
@@ -85,11 +86,22 @@ function updateData(newData) {
 
       var punishmentCell = newRow.insertCell(3);
       punishmentCell.innerHTML = newItem.needPunish ? newItem.punishAmount : 0;
+      if (newItem.needPunish == false) {
+        if (newItem.canSell == true) {
+          punishmentCell.innerHTML = 2;
+        } else {
+          punishmentCell.innerHTML = 0;
+        }
+      } else {
+        punishmentCell.innerHTML = 1;
+      }
 
       if (punishmentCell.innerHTML == 0) {
-        newRow.style.backgroundColor = "#edffed";
+        newRow.style.backgroundColor = "#40f55b";
+      } else if (punishmentCell.innerHTML == 1) {
+        newRow.style.backgroundColor = "#f57a7a";
       } else {
-        newRow.style.backgroundColor = "#ffeded";
+        newRow.style.backgroundColor = "#09c7ed";
       }
     }
   });
