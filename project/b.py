@@ -1,9 +1,10 @@
 from flask import Flask, jsonify
+from flask_cors import CORS
 import requests
 from apscheduler.schedulers.background import BackgroundScheduler
 from web3 import Web3
 app = Flask(__name__)
-
+CORS(app)
 hashMapOfProducts = {
     "0xf39fd6e51aad88f6f4ce6ab8827279cfffb92266": 5,
     "0x9d70a76e6f5e5da7950585a59522b2f8efb49f66": 10,
@@ -33,536 +34,537 @@ exampleHashMap = {address[0]: [address[1], address[2],address[3],address[4]] for
 # 0xf9Cf6A857F6faA8e7600fB0B6fC45e5c28d6b458
 
 web3 = Web3(Web3.HTTPProvider('https://eth-sepolia.g.alchemy.com/v2/AsRLVXZLZMPKrruB1nFRRSGfSquRWJtA'))
-url = "https://api-sepolia.etherscan.io/api?module=logs&action=getLogs&fromBlock=0&toBlock=latest&address=0x0068Cf9f4e9A003a6858Caa5a115B25E8B209d22&api_key=9MWB7ZQYSHVYVE7C85IPMSQUVR1CAYUTWN"
+url = "https://api-sepolia.etherscan.io/api?module=logs&action=getLogs&fromBlock=0&toBlock=latest&address=0xEFe02f957CA693e1F09615AAf1aDE6a93400aa87&api_key=9MWB7ZQYSHVYVE7C85IPMSQUVR1CAYUTWN"
 private_key = "46fcb707d3d440ad20741f0e4d722a54817f4641ae4ecdfa6d72f25344130323"
 account = web3.eth.account.from_key(private_key)
 
 
 contract_abi = [
-	{
-		"inputs": [],
-		"name": "acceptOwnership",
-		"outputs": [],
-		"stateMutability": "nonpayable",
-		"type": "function"
-	},
-	{
-		"inputs": [
-			{
-				"internalType": "uint256",
-				"name": "moneyAmount",
-				"type": "uint256"
-			},
-			{
-				"internalType": "address",
-				"name": "marketAddress",
-				"type": "address"
-			}
-		],
-		"name": "addMoney",
-		"outputs": [],
-		"stateMutability": "nonpayable",
-		"type": "function"
-	},
-	{
-		"inputs": [
-			{
-				"internalType": "uint256",
-				"name": "amountOfProduct",
-				"type": "uint256"
-			},
-			{
-				"internalType": "uint256",
-				"name": "totalPrice",
-				"type": "uint256"
-			},
-			{
-				"internalType": "address",
-				"name": "addressOfProduct",
-				"type": "address"
-			},
-			{
-				"internalType": "address",
-				"name": "marketAddress",
-				"type": "address"
-			}
-		],
-		"name": "buyProduct",
-		"outputs": [],
-		"stateMutability": "nonpayable",
-		"type": "function"
-	},
-	{
-		"inputs": [],
-		"stateMutability": "nonpayable",
-		"type": "constructor"
-	},
-	{
-		"anonymous": False,
-		"inputs": [
-			{
-				"indexed": True,
-				"internalType": "bytes32",
-				"name": "id",
-				"type": "bytes32"
-			}
-		],
-		"name": "ChainlinkCancelled",
-		"type": "event"
-	},
-	{
-		"anonymous": False,
-		"inputs": [
-			{
-				"indexed": True,
-				"internalType": "bytes32",
-				"name": "id",
-				"type": "bytes32"
-			}
-		],
-		"name": "ChainlinkFulfilled",
-		"type": "event"
-	},
-	{
-		"anonymous": False,
-		"inputs": [
-			{
-				"indexed": True,
-				"internalType": "bytes32",
-				"name": "id",
-				"type": "bytes32"
-			}
-		],
-		"name": "ChainlinkRequested",
-		"type": "event"
-	},
-	{
-		"inputs": [
-			{
-				"internalType": "bytes32",
-				"name": "_requestCanSell",
-				"type": "bytes32"
-			},
-			{
-				"internalType": "bool",
-				"name": "_canSell",
-				"type": "bool"
-			}
-		],
-		"name": "fulfillCanSell",
-		"outputs": [],
-		"stateMutability": "nonpayable",
-		"type": "function"
-	},
-	{
-		"anonymous": False,
-		"inputs": [
-			{
-				"indexed": True,
-				"internalType": "address",
-				"name": "from",
-				"type": "address"
-			},
-			{
-				"indexed": True,
-				"internalType": "address",
-				"name": "to",
-				"type": "address"
-			}
-		],
-		"name": "OwnershipTransferRequested",
-		"type": "event"
-	},
-	{
-		"anonymous": False,
-		"inputs": [
-			{
-				"indexed": True,
-				"internalType": "address",
-				"name": "from",
-				"type": "address"
-			},
-			{
-				"indexed": True,
-				"internalType": "address",
-				"name": "to",
-				"type": "address"
-			}
-		],
-		"name": "OwnershipTransferred",
-		"type": "event"
-	},
-	{
-		"inputs": [],
-		"name": "requestCanSell",
-		"outputs": [
-			{
-				"internalType": "bytes32",
-				"name": "requestId",
-				"type": "bytes32"
-			}
-		],
-		"stateMutability": "nonpayable",
-		"type": "function"
-	},
-	{
-		"anonymous": False,
-		"inputs": [
-			{
-				"indexed": True,
-				"internalType": "bytes32",
-				"name": "requestId",
-				"type": "bytes32"
-			},
-			{
-				"indexed": False,
-				"internalType": "bool",
-				"name": "canSell",
-				"type": "bool"
-			}
-		],
-		"name": "RequestCanSell",
-		"type": "event"
-	},
-	{
-		"inputs": [
-			{
-				"internalType": "uint256",
-				"name": "_amountOfProduct",
-				"type": "uint256"
-			},
-			{
-				"internalType": "uint256",
-				"name": "_priceOfTheProduct",
-				"type": "uint256"
-			},
-			{
-				"internalType": "address",
-				"name": "_productCode",
-				"type": "address"
-			},
-			{
-				"internalType": "address",
-				"name": "_marketAddress",
-				"type": "address"
-			}
-		],
-		"name": "transaction",
-		"outputs": [],
-		"stateMutability": "nonpayable",
-		"type": "function"
-	},
-	{
-		"anonymous": False,
-		"inputs": [
-			{
-				"indexed": True,
-				"internalType": "uint256",
-				"name": "_amountOfProduct",
-				"type": "uint256"
-			},
-			{
-				"indexed": True,
-				"internalType": "uint256",
-				"name": "_priceOfTheProduct",
-				"type": "uint256"
-			},
-			{
-				"indexed": True,
-				"internalType": "address",
-				"name": "_productCode",
-				"type": "address"
-			},
-			{
-				"indexed": False,
-				"internalType": "address",
-				"name": "_marketAddress",
-				"type": "address"
-			},
-			{
-				"indexed": False,
-				"internalType": "address",
-				"name": "_contractAddress",
-				"type": "address"
-			},
-			{
-				"indexed": False,
-				"internalType": "bool",
-				"name": "isTransaction",
-				"type": "bool"
-			}
-		],
-		"name": "Transaction",
-		"type": "event"
-	},
-	{
-		"anonymous": False,
-		"inputs": [
-			{
-				"indexed": True,
-				"internalType": "uint256",
-				"name": "_amountOfProduct",
-				"type": "uint256"
-			},
-			{
-				"indexed": True,
-				"internalType": "uint256",
-				"name": "_priceOfTheProduct",
-				"type": "uint256"
-			},
-			{
-				"indexed": True,
-				"internalType": "address",
-				"name": "_productCode",
-				"type": "address"
-			},
-			{
-				"indexed": False,
-				"internalType": "address",
-				"name": "_marketAddress",
-				"type": "address"
-			},
-			{
-				"indexed": False,
-				"internalType": "address",
-				"name": "_contractAddress",
-				"type": "address"
-			},
-			{
-				"indexed": False,
-				"internalType": "bool",
-				"name": "isTransaction",
-				"type": "bool"
-			}
-		],
-		"name": "buyRequest",
-		"type": "event"
-	},
-	{
-		"inputs": [
-			{
-				"internalType": "uint256",
-				"name": "penaltyFee",
-				"type": "uint256"
-			},
-			{
-				"internalType": "address",
-				"name": "guiltyAddress",
-				"type": "address"
-			}
-		],
-		"name": "punish",
-		"outputs": [
-			{
-				"internalType": "bool",
-				"name": "",
-				"type": "bool"
-			}
-		],
-		"stateMutability": "nonpayable",
-		"type": "function"
-	},
-	{
-		"anonymous": False,
-		"inputs": [
-			{
-				"indexed": True,
-				"internalType": "bool",
-				"name": "_punishment",
-				"type": "bool"
-			}
-		],
-		"name": "punishment",
-		"type": "event"
-	},
-	{
-		"inputs": [
-			{
-				"internalType": "uint256",
-				"name": "amountOfProduct",
-				"type": "uint256"
-			},
-			{
-				"internalType": "uint256",
-				"name": "totalPrice",
-				"type": "uint256"
-			},
-			{
-				"internalType": "address",
-				"name": "addressOfProduct",
-				"type": "address"
-			},
-			{
-				"internalType": "address",
-				"name": "marketAddress",
-				"type": "address"
-			}
-		],
-		"name": "requestProduct",
-		"outputs": [],
-		"stateMutability": "nonpayable",
-		"type": "function"
-	},
-	{
-		"inputs": [
-			{
-				"internalType": "address",
-				"name": "to",
-				"type": "address"
-			}
-		],
-		"name": "transferOwnership",
-		"outputs": [],
-		"stateMutability": "nonpayable",
-		"type": "function"
-	},
-	{
-		"inputs": [],
-		"name": "canSell",
-		"outputs": [
-			{
-				"internalType": "bool",
-				"name": "",
-				"type": "bool"
-			}
-		],
-		"stateMutability": "view",
-		"type": "function"
-	},
-	{
-		"inputs": [
-			{
-				"internalType": "address",
-				"name": "marketAddress",
-				"type": "address"
-			}
-		],
-		"name": "checkdept",
-		"outputs": [
-			{
-				"internalType": "uint256",
-				"name": "",
-				"type": "uint256"
-			}
-		],
-		"stateMutability": "view",
-		"type": "function"
-	},
-	{
-		"inputs": [
-			{
-				"internalType": "address",
-				"name": "marketAddress",
-				"type": "address"
-			}
-		],
-		"name": "checkVault",
-		"outputs": [
-			{
-				"internalType": "uint256",
-				"name": "",
-				"type": "uint256"
-			}
-		],
-		"stateMutability": "view",
-		"type": "function"
-	},
-	{
-		"inputs": [
-			{
-				"internalType": "address",
-				"name": "",
-				"type": "address"
-			}
-		],
-		"name": "dept",
-		"outputs": [
-			{
-				"internalType": "uint256",
-				"name": "",
-				"type": "uint256"
-			}
-		],
-		"stateMutability": "view",
-		"type": "function"
-	},
-	{
-		"inputs": [],
-		"name": "owner",
-		"outputs": [
-			{
-				"internalType": "address",
-				"name": "",
-				"type": "address"
-			}
-		],
-		"stateMutability": "view",
-		"type": "function"
-	},
-	{
-		"inputs": [],
-		"name": "s_marketAddress",
-		"outputs": [
-			{
-				"internalType": "address",
-				"name": "",
-				"type": "address"
-			}
-		],
-		"stateMutability": "view",
-		"type": "function"
-	},
-	{
-		"inputs": [],
-		"name": "s_priceOfTheProduct",
-		"outputs": [
-			{
-				"internalType": "uint256",
-				"name": "",
-				"type": "uint256"
-			}
-		],
-		"stateMutability": "view",
-		"type": "function"
-	},
-	{
-		"inputs": [],
-		"name": "s_productCode",
-		"outputs": [
-			{
-				"internalType": "address",
-				"name": "",
-				"type": "address"
-			}
-		],
-		"stateMutability": "view",
-		"type": "function"
-	},
-	{
-		"inputs": [
-			{
-				"internalType": "address",
-				"name": "",
-				"type": "address"
-			}
-		],
-		"name": "vault",
-		"outputs": [
-			{
-				"internalType": "uint256",
-				"name": "",
-				"type": "uint256"
-			}
-		],
-		"stateMutability": "view",
-		"type": "function"
-	}
+    {
+        "inputs": [],
+        "stateMutability": "nonpayable",
+        "type": "constructor"
+    },
+    {
+        "anonymous": False,
+        "inputs": [
+            {
+                "indexed": True,
+                "internalType": "bytes32",
+                "name": "id",
+                "type": "bytes32"
+            }
+        ],
+        "name": "ChainlinkCancelled",
+        "type": "event"
+    },
+    {
+        "anonymous": False,
+        "inputs": [
+            {
+                "indexed": True,
+                "internalType": "bytes32",
+                "name": "id",
+                "type": "bytes32"
+            }
+        ],
+        "name": "ChainlinkFulfilled",
+        "type": "event"
+    },
+    {
+        "anonymous": False,
+        "inputs": [
+            {
+                "indexed": True,
+                "internalType": "bytes32",
+                "name": "id",
+                "type": "bytes32"
+            }
+        ],
+        "name": "ChainlinkRequested",
+        "type": "event"
+    },
+    {
+        "anonymous": False,
+        "inputs": [
+            {
+                "indexed": True,
+                "internalType": "address",
+                "name": "from",
+                "type": "address"
+            },
+            {
+                "indexed": True,
+                "internalType": "address",
+                "name": "to",
+                "type": "address"
+            }
+        ],
+        "name": "OwnershipTransferRequested",
+        "type": "event"
+    },
+    {
+        "anonymous": False,
+        "inputs": [
+            {
+                "indexed": True,
+                "internalType": "address",
+                "name": "from",
+                "type": "address"
+            },
+            {
+                "indexed": True,
+                "internalType": "address",
+                "name": "to",
+                "type": "address"
+            }
+        ],
+        "name": "OwnershipTransferred",
+        "type": "event"
+    },
+    {
+        "anonymous": False,
+        "inputs": [
+            {
+                "indexed": True,
+                "internalType": "bytes32",
+                "name": "requestId",
+                "type": "bytes32"
+            },
+            {
+                "indexed": False,
+                "internalType": "bool",
+                "name": "canSell",
+                "type": "bool"
+            }
+        ],
+        "name": "RequestCanSell",
+        "type": "event"
+    },
+    {
+        "anonymous": False,
+        "inputs": [
+            {
+                "indexed": True,
+                "internalType": "uint256",
+                "name": "_amountOfProduct",
+                "type": "uint256"
+            },
+            {
+                "indexed": True,
+                "internalType": "uint256",
+                "name": "_priceOfTheProduct",
+                "type": "uint256"
+            },
+            {
+                "indexed": True,
+                "internalType": "address",
+                "name": "_productCode",
+                "type": "address"
+            },
+            {
+                "indexed": False,
+                "internalType": "address",
+                "name": "_marketAddress",
+                "type": "address"
+            },
+            {
+                "indexed": False,
+                "internalType": "address",
+                "name": "_contractAddress",
+                "type": "address"
+            },
+            {
+                "indexed": False,
+                "internalType": "bool",
+                "name": "isTransaction",
+                "type": "bool"
+            }
+        ],
+        "name": "Transaction",
+        "type": "event"
+    },
+    {
+        "anonymous": False,
+        "inputs": [
+            {
+                "indexed": True,
+                "internalType": "uint256",
+                "name": "_amountOfProduct",
+                "type": "uint256"
+            },
+            {
+                "indexed": True,
+                "internalType": "uint256",
+                "name": "_priceOfTheProduct",
+                "type": "uint256"
+            },
+            {
+                "indexed": True,
+                "internalType": "address",
+                "name": "_productCode",
+                "type": "address"
+            },
+            {
+                "indexed": False,
+                "internalType": "address",
+                "name": "_marketAddress",
+                "type": "address"
+            },
+            {
+                "indexed": False,
+                "internalType": "address",
+                "name": "_contractAddress",
+                "type": "address"
+            },
+            {
+                "indexed": False,
+                "internalType": "bool",
+                "name": "isTransaction",
+                "type": "bool"
+            }
+        ],
+        "name": "buyRequest",
+        "type": "event"
+    },
+    {
+        "anonymous": False,
+        "inputs": [
+            {
+                "indexed": True,
+                "internalType": "bool",
+                "name": "_punishment",
+                "type": "bool"
+            }
+        ],
+        "name": "punishment",
+        "type": "event"
+    },
+    {
+        "inputs": [],
+        "name": "acceptOwnership",
+        "outputs": [],
+        "stateMutability": "nonpayable",
+        "type": "function"
+    },
+    {
+        "inputs": [
+            {
+                "internalType": "uint256",
+                "name": "moneyAmount",
+                "type": "uint256"
+            },
+            {
+                "internalType": "address",
+                "name": "marketAddress",
+                "type": "address"
+            }
+        ],
+        "name": "addMoney",
+        "outputs": [],
+        "stateMutability": "nonpayable",
+        "type": "function"
+    },
+    {
+        "inputs": [
+            {
+                "internalType": "uint256",
+                "name": "amountOfProduct",
+                "type": "uint256"
+            },
+            {
+                "internalType": "uint256",
+                "name": "totalPrice",
+                "type": "uint256"
+            },
+            {
+                "internalType": "address",
+                "name": "addressOfProduct",
+                "type": "address"
+            },
+            {
+                "internalType": "address",
+                "name": "marketAddress",
+                "type": "address"
+            }
+        ],
+        "name": "buyProduct",
+        "outputs": [],
+        "stateMutability": "nonpayable",
+        "type": "function"
+    },
+    {
+        "inputs": [],
+        "name": "canSell",
+        "outputs": [
+            {
+                "internalType": "bool",
+                "name": "",
+                "type": "bool"
+            }
+        ],
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "inputs": [
+            {
+                "internalType": "address",
+                "name": "marketAddress",
+                "type": "address"
+            }
+        ],
+        "name": "checkVault",
+        "outputs": [
+            {
+                "internalType": "uint256",
+                "name": "",
+                "type": "uint256"
+            }
+        ],
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "inputs": [
+            {
+                "internalType": "address",
+                "name": "marketAddress",
+                "type": "address"
+            }
+        ],
+        "name": "checkdept",
+        "outputs": [
+            {
+                "internalType": "uint256",
+                "name": "",
+                "type": "uint256"
+            }
+        ],
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "inputs": [
+            {
+                "internalType": "address",
+                "name": "",
+                "type": "address"
+            }
+        ],
+        "name": "dept",
+        "outputs": [
+            {
+                "internalType": "uint256",
+                "name": "",
+                "type": "uint256"
+            }
+        ],
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "inputs": [
+            {
+                "internalType": "bytes32",
+                "name": "_requestCanSell",
+                "type": "bytes32"
+            },
+            {
+                "internalType": "bool",
+                "name": "_canSell",
+                "type": "bool"
+            }
+        ],
+        "name": "fulfillCanSell",
+        "outputs": [],
+        "stateMutability": "nonpayable",
+        "type": "function"
+    },
+    {
+        "inputs": [],
+        "name": "owner",
+        "outputs": [
+            {
+                "internalType": "address",
+                "name": "",
+                "type": "address"
+            }
+        ],
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "inputs": [
+            {
+                "internalType": "uint256",
+                "name": "penaltyFee",
+                "type": "uint256"
+            },
+            {
+                "internalType": "address",
+                "name": "guiltyAddress",
+                "type": "address"
+            }
+        ],
+        "name": "punish",
+        "outputs": [
+            {
+                "internalType": "bool",
+                "name": "",
+                "type": "bool"
+            }
+        ],
+        "stateMutability": "nonpayable",
+        "type": "function"
+    },
+    {
+        "inputs": [],
+        "name": "requestCanSell",
+        "outputs": [
+            {
+                "internalType": "bytes32",
+                "name": "requestId",
+                "type": "bytes32"
+            }
+        ],
+        "stateMutability": "nonpayable",
+        "type": "function"
+    },
+    {
+        "inputs": [
+            {
+                "internalType": "uint256",
+                "name": "amountOfProduct",
+                "type": "uint256"
+            },
+            {
+                "internalType": "uint256",
+                "name": "totalPrice",
+                "type": "uint256"
+            },
+            {
+                "internalType": "address",
+                "name": "addressOfProduct",
+                "type": "address"
+            },
+            {
+                "internalType": "address",
+                "name": "marketAddress",
+                "type": "address"
+            }
+        ],
+        "name": "requestProduct",
+        "outputs": [],
+        "stateMutability": "nonpayable",
+        "type": "function"
+    },
+    {
+        "inputs": [],
+        "name": "s_marketAddress",
+        "outputs": [
+            {
+                "internalType": "address",
+                "name": "",
+                "type": "address"
+            }
+        ],
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "inputs": [],
+        "name": "s_priceOfTheProduct",
+        "outputs": [
+            {
+                "internalType": "uint256",
+                "name": "",
+                "type": "uint256"
+            }
+        ],
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "inputs": [],
+        "name": "s_productCode",
+        "outputs": [
+            {
+                "internalType": "address",
+                "name": "",
+                "type": "address"
+            }
+        ],
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "inputs": [
+            {
+                "internalType": "uint256",
+                "name": "_amountOfProduct",
+                "type": "uint256"
+            },
+            {
+                "internalType": "uint256",
+                "name": "_priceOfTheProduct",
+                "type": "uint256"
+            },
+            {
+                "internalType": "address",
+                "name": "_productCode",
+                "type": "address"
+            },
+            {
+                "internalType": "address",
+                "name": "_marketAddress",
+                "type": "address"
+            }
+        ],
+        "name": "transaction",
+        "outputs": [],
+        "stateMutability": "nonpayable",
+        "type": "function"
+    },
+    {
+        "inputs": [
+            {
+                "internalType": "address",
+                "name": "to",
+                "type": "address"
+            }
+        ],
+        "name": "transferOwnership",
+        "outputs": [],
+        "stateMutability": "nonpayable",
+        "type": "function"
+    },
+    {
+        "inputs": [
+            {
+                "internalType": "address",
+                "name": "",
+                "type": "address"
+            }
+        ],
+        "name": "vault",
+        "outputs": [
+            {
+                "internalType": "uint256",
+                "name": "",
+                "type": "uint256"
+            }
+        ],
+        "stateMutability": "view",
+        "type": "function"
+    }
 ]
 response = requests.get(url)
 result = response.json().get('result')
 api_data_counter = len(result)-1
 oldTimeStamp= ""
 timeStamp = ""
+oldProductCode,oldRealPrice,oldSellingPrice,oldMarketAddress,oldBuyerAddress,oldWantedProductAddress,oldWantedAmountOfProduct,oldTheMoneyToBuy,oldCanSell,oldPunishAmount,oldNeedPunish,oldContractAddress,oldIsTransaction =None, None,None,None,None,None,None,None,None,None,None,None,None
 #Kendimize notlar:
 #Counter eklenerek topics arraylerinin iclerindeki hardcode giderilebilir.
 #örnek sayıları arttırılmalı.
@@ -570,12 +572,29 @@ def get_product_info():
     global api_data_counter 
     global timeStamp
     global oldTimeStamp
+    global oldProductCode
+    global oldRealPrice
+    global oldSellingPrice
+    global oldMarketAddress
+    global oldBuyerAddress
+    global oldWantedProductAddress
+    global oldWantedAmountOfProduct
+    global oldTheMoneyToBuy
+    global oldCanSell
+    global oldPunishAmount
+    global oldNeedPunish
+    global oldContractAddress
+    global oldIsTransaction
+
     response = requests.get(url)
     result = response.json().get('result')
     index = int(len(result)-1)
-    timeStamp = result[index]['timeStamp']
+    try:
+        timeStamp = result[index]['timeStamp']
+    except:
+        print("Max rate limit reached")
+
     print("time stamp is" + timeStamp)
-    
     if result and len(result) > api_data_counter and oldTimeStamp != timeStamp:
         
         print(len(result))
@@ -585,7 +604,7 @@ def get_product_info():
             topics = result_item.get('topics')
         else:
             print("Unexpected result item:", result_item)
-            return (None,) * 13
+            return oldProductCode,oldRealPrice,oldSellingPrice,oldMarketAddress,oldBuyerAddress,oldWantedProductAddress,oldWantedAmountOfProduct,oldTheMoneyToBuy,oldCanSell,oldPunishAmount,oldNeedPunish,oldContractAddress,oldIsTransaction
         api_data_counter = len(result)-1
         print(len(topics))
         if len(topics) != 2:
@@ -659,12 +678,25 @@ def get_product_info():
                 signed_txn2 = web3.eth.account.sign_transaction(transactionBuy, private_key=private_key)
                 transaction_hash = web3.eth.send_raw_transaction(signed_txn2.rawTransaction)
                 print("The product is available in the market")
+            oldProductCode = productCode
+            oldRealPrice = realPrice
+            oldSellingPrice = sellingPrice
+            oldMarketAddress = marketAddress
+            oldBuyerAddress = buyerAddress
+            oldWantedProductAddress = wantedProductAddress
+            oldWantedAmountOfProduct = wantedAmountOfProduct
+            oldTheMoneyToBuy = theMoneyToBuy
+            oldCanSell = canSell
+            oldPunishAmount = punishAmount
+            oldNeedPunish = needPunish
+            oldContractAddress = contractAddress
+            oldIsTransaction = isTransaction
             return productCode, realPrice, sellingPrice , marketAddress , buyerAddress , wantedProductAddress , wantedAmountOfProduct , theMoneyToBuy , canSell , punishAmount ,needPunish ,contractAddress , isTransaction
         else:
            
-            return (None,) * 13
+            return oldProductCode,oldRealPrice,oldSellingPrice,oldMarketAddress,oldBuyerAddress,oldWantedProductAddress,oldWantedAmountOfProduct,oldTheMoneyToBuy,oldCanSell,oldPunishAmount,oldNeedPunish,oldContractAddress,oldIsTransaction
     else:
-        print("Waiting for a new block")
+        return oldProductCode,oldRealPrice,oldSellingPrice,oldMarketAddress,oldBuyerAddress,oldWantedProductAddress,oldWantedAmountOfProduct,oldTheMoneyToBuy,oldCanSell,oldPunishAmount,oldNeedPunish,oldContractAddress,oldIsTransaction
         
 
 def scheduled_product_info():
@@ -674,10 +706,12 @@ def scheduled_product_info():
 
 @app.route('/api/products', methods=['GET'])
 def products():
-    productCode, realPrice, sellingPrice , marketAddress,buyerAddress , wantedProductAddress , wantedAmountOfProduct , theMoneyToBuy,canSell, punishAmount,needPunish , contractAddress, isTransaction = get_product_info() # Notice the updated return values
-    
-    if productCode or realPrice or sellingPrice or marketAddress or buyerAddress or wantedProductAddress or wantedAmountOfProduct or theMoneyToBuy or canSell or punishAmount or needPunish or contractAddress or isTransaction:
-        product_info = {
+    product_info = get_product_info()
+
+    if product_info:
+        productCode, realPrice, sellingPrice, marketAddress, buyerAddress, wantedProductAddress, wantedAmountOfProduct, theMoneyToBuy, canSell, punishAmount, needPunish, contractAddress, isTransaction = product_info
+
+        product_info_dict = {
             "addressOfProduct": productCode,
             "realPrice": realPrice,
             "sellingPrice": sellingPrice,
@@ -690,17 +724,16 @@ def products():
             "punishAmount": punishAmount,
             "needPunish": needPunish,
             "contractAddress": str(contractAddress),
-			"isTransaction" : isTransaction
-
+            "isTransaction": isTransaction
         }
-        return jsonify([product_info])
+        return jsonify([product_info_dict])
     else:
-        print("Last transaction is punish. Waiting for new transaction")
+        print("Last transaction is punish. Waiting for a new transaction")
         return jsonify({"error": "No product found"}), 400
 
 scheduler = BackgroundScheduler(daemon=True)
 # Schedule the job to update the product info every 7 seconds
-scheduler.add_job(scheduled_product_info, 'interval', seconds=15)
+scheduler.add_job(scheduled_product_info, 'interval', seconds=20)
 scheduler.start()
 
 

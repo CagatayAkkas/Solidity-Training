@@ -15,3 +15,4 @@ existing_data.append(data)
 # Write the updated data back to data.json
 with open('data.json', 'w') as file:
     json.dump(existing_data, file, indent=4)
+
