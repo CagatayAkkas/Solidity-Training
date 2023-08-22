@@ -86,21 +86,31 @@ function updateData(newData) {
 
       var punishmentCell = newRow.insertCell(3);
       punishmentCell.innerHTML = newItem.needPunish ? newItem.punishAmount : 0;
+
       if (newItem.needPunish == false) {
         if (newItem.canSell == true) {
-          punishmentCell.innerHTML = 2;
+          statusT = 2;
+          punishmentCell.innerHTML = 0;
         } else {
+          statusT = 0;
           punishmentCell.innerHTML = 0;
         }
       } else {
+        statusT = 1;
         punishmentCell.innerHTML = 1;
+        punishmentCell.innerHTML = newItem.needPunish
+          ? newItem.punishAmount
+          : 0;
       }
 
-      if (punishmentCell.innerHTML == 0) {
+      if (statusT == 0) {
+        //correct transaction
         newRow.style.backgroundColor = "#40f55b";
-      } else if (punishmentCell.innerHTML == 1) {
+      } else if (statusT == 1) {
+        //punish transaction
         newRow.style.backgroundColor = "#f57a7a";
       } else {
+        //buy request
         newRow.style.backgroundColor = "#09c7ed";
       }
     }
