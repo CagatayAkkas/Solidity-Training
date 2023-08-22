@@ -39,7 +39,7 @@ private_key = "46fcb707d3d440ad20741f0e4d722a54817f4641ae4ecdfa6d72f25344130323"
 account = web3.eth.account.from_key(private_key)
 
 
-contract_abi = [
+contract_abi=[
 	{
 		"inputs": [],
 		"name": "acceptOwnership",
@@ -564,7 +564,7 @@ result = response.json().get('result')
 api_data_counter = len(result)-1
 oldTimeStamp= ""
 timeStamp = ""
-oldProductCode,oldRealPrice,oldSellingPrice,oldMarketAddress,oldBuyerAddress,oldWantedProductAddress,oldWantedAmountOfProduct,oldTheMoneyToBuy,oldCanSell,oldPunishAmount,oldNeedPunish,oldContractAddress,oldIsTransaction =None, None,None,None,None,None,None,None,None,None,None,None,None
+oldProductCode,oldRealPrice,oldSellingPrice,oldMarketAddress,oldBuyerAddress,oldWantedProductAddress,oldWantedAmountOfProduct,oldTheMoneyToBuy,oldCanSell,oldPunishAmount,oldNeedPunish,oldContractAddress,oldIsTransaction,oldTimeStamp =None, None,None,None,None,None,None,None,None,None,None,None,None,None
 #Kendimize notlar:
 #Counter eklenerek topics arraylerinin iclerindeki hardcode giderilebilir.
 #örnek sayıları arttırılmalı.
@@ -604,7 +604,7 @@ def get_product_info():
             topics = result_item.get('topics')
         else:
             print("Unexpected result item:", result_item)
-            return oldProductCode,oldRealPrice,oldSellingPrice,oldMarketAddress,oldBuyerAddress,oldWantedProductAddress,oldWantedAmountOfProduct,oldTheMoneyToBuy,oldCanSell,oldPunishAmount,oldNeedPunish,oldContractAddress,oldIsTransaction
+            return oldProductCode,oldRealPrice,oldSellingPrice,oldMarketAddress,oldBuyerAddress,oldWantedProductAddress,oldWantedAmountOfProduct,oldTheMoneyToBuy,oldCanSell,oldPunishAmount,oldNeedPunish,oldContractAddress,oldIsTransaction,oldTimeStamp
         api_data_counter = len(result)-1
         print(len(topics))
         if len(topics) != 2:
@@ -659,7 +659,7 @@ def get_product_info():
                 
             canSell = False
         
-            print("api data counter " + str(api_data_counter) +"\n contract Address " + str(contractAddress) + "\n selling price" + str(sellingPrice) + "\n product code" + str(productCode) + "\n real price " + str(realPrice) + "\n market address " + str(marketAddress) + "\n buyer address " + str(buyerAddress) + "\n wanted product address " + str(wantedProductAddress) + "\n wanted amount of product " + str(wantedAmountOfProduct) + "\n the money to buy " + str(theMoneyToBuy) + "\n code of product from market " + str(codeOfProductFromMarket) + "\n current stock " + str(currentStock) + "\n punish amount " + str(punishAmount) + "\n need punish " + str(needPunish) + "\n contract address " + str(contractAddress) + "\n is transaction " + str(isTransaction))
+            print("api data counter " + str(api_data_counter) +"\n contract Address " + str(contractAddress) + "\n selling price" + str(sellingPrice) + "\n product code" + str(productCode) + "\n real price " + str(realPrice) + "\n market address " + str(marketAddress) + "\n buyer address " + str(buyerAddress) + "\n wanted product address " + str(wantedProductAddress) + "\n wanted amount of product " + str(wantedAmountOfProduct) + "\n the money to buy " + str(theMoneyToBuy) + "\n code of product from market " + str(codeOfProductFromMarket) + "\n current stock " + str(currentStock) + "\n punish amount " + str(punishAmount) + "\n need punish " + str(needPunish) + "\n contract address " + str(contractAddress) + "\n is transaction " + str(isTransaction)+ "\n time stamp" + str(timeStamp))
             if currentStock+wantedAmountOfProduct <= stockLimit and isTransaction==False and  theMoneyToBuy >= wantedAmountOfProduct* (hashMapOfProducts.get(wantedProductAddress.lower()))  and str(codeOfProductFromMarket.lower()) == str(wantedProductAddress.lower()):
                 canSell = True
                 print("I AM MAKİNG THE TRANSACTİON OF BUYY")
@@ -691,12 +691,12 @@ def get_product_info():
             oldNeedPunish = needPunish
             oldContractAddress = contractAddress
             oldIsTransaction = isTransaction
-            return productCode, realPrice, sellingPrice , marketAddress , buyerAddress , wantedProductAddress , wantedAmountOfProduct , theMoneyToBuy , canSell , punishAmount ,needPunish ,contractAddress , isTransaction
+            return productCode, realPrice, sellingPrice , marketAddress , buyerAddress , wantedProductAddress , wantedAmountOfProduct , theMoneyToBuy , canSell , punishAmount ,needPunish ,contractAddress , isTransaction,timeStamp
         else:
            
-            return oldProductCode,oldRealPrice,oldSellingPrice,oldMarketAddress,oldBuyerAddress,oldWantedProductAddress,oldWantedAmountOfProduct,oldTheMoneyToBuy,oldCanSell,oldPunishAmount,oldNeedPunish,oldContractAddress,oldIsTransaction
+            return oldProductCode,oldRealPrice,oldSellingPrice,oldMarketAddress,oldBuyerAddress,oldWantedProductAddress,oldWantedAmountOfProduct,oldTheMoneyToBuy,oldCanSell,oldPunishAmount,oldNeedPunish,oldContractAddress,oldIsTransaction,oldTimeStamp
     else:
-        return oldProductCode,oldRealPrice,oldSellingPrice,oldMarketAddress,oldBuyerAddress,oldWantedProductAddress,oldWantedAmountOfProduct,oldTheMoneyToBuy,oldCanSell,oldPunishAmount,oldNeedPunish,oldContractAddress,oldIsTransaction
+        return oldProductCode,oldRealPrice,oldSellingPrice,oldMarketAddress,oldBuyerAddress,oldWantedProductAddress,oldWantedAmountOfProduct,oldTheMoneyToBuy,oldCanSell,oldPunishAmount,oldNeedPunish,oldContractAddress,oldIsTransaction,oldTimeStamp
         
 
 def scheduled_product_info():
@@ -709,7 +709,7 @@ def products():
     product_info = get_product_info()
 
     if product_info:
-        productCode, realPrice, sellingPrice, marketAddress, buyerAddress, wantedProductAddress, wantedAmountOfProduct, theMoneyToBuy, canSell, punishAmount, needPunish, contractAddress, isTransaction = product_info
+        productCode, realPrice, sellingPrice, marketAddress, buyerAddress, wantedProductAddress, wantedAmountOfProduct, theMoneyToBuy, canSell, punishAmount, needPunish, contractAddress, isTransaction,timeStamp = product_info
 
         product_info_dict = {
             "addressOfProduct": productCode,
@@ -724,7 +724,8 @@ def products():
             "punishAmount": punishAmount,
             "needPunish": needPunish,
             "contractAddress": str(contractAddress),
-            "isTransaction": isTransaction
+            "isTransaction": isTransaction,
+            "timeStamp": timeStamp
         }
         return jsonify([product_info_dict])
     else:
