@@ -14,7 +14,9 @@ hashMapOfProducts = {
 marketAddresses = [
     ["0x7efd0b777026a9c42757d92a3f79361467372435", "0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266", 10, 10,20],
     ["0x5b38da6a701c568545dcfcb03fcb875f56beddc4", "0x9d70a76e6f5e5da7950585a59522b2f8efb49f66", 20, 15,30],
-    ["0x4b20993bc481177ec7e8f571cecae8a9e22c02db", "0x63a6f8e70f1e666dd6afe2e51652370772a7b2d6", 30, 20,40]
+    ["0x4b20993bc481177ec7e8f571cecae8a9e22c02db", "0x63a6f8e70f1e666dd6afe2e51652370772a7b2d6", 30, 20,40],
+    ["0x97E7f2B08a14e4C0A8Dca87fbEB1F68b397c91df", "0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266", 10, 10,20],
+    
 ]
 #    marketAddress           productAddress                totalAmountInHand  #Punish Amount #stock limit
 
@@ -34,7 +36,7 @@ exampleHashMap = {address[0]: [address[1], address[2],address[3],address[4]] for
 # 0xf9Cf6A857F6faA8e7600fB0B6fC45e5c28d6b458
 
 web3 = Web3(Web3.HTTPProvider('https://eth-sepolia.g.alchemy.com/v2/AsRLVXZLZMPKrruB1nFRRSGfSquRWJtA'))
-url = "https://api-sepolia.etherscan.io/api?module=logs&action=getLogs&fromBlock=0&toBlock=latest&address=0x33aA822F7A016F65080A7C39cb168ffFcb23c888&api_key=9MWB7ZQYSHVYVE7C85IPMSQUVR1CAYUTWN"
+url = "https://explorer.testedge2.haqq.network/api/v2/addresses/0xf95770a25E27927117b9b1f2Fd63b0cc7B94669b/transactions?filter=to%20%7C%20from"
 private_key = "46fcb707d3d440ad20741f0e4d722a54817f4641ae4ecdfa6d72f25344130323"
 account = web3.eth.account.from_key(private_key)
 
@@ -160,12 +162,6 @@ contract_abi = [
 				"internalType": "address",
 				"name": "_contractAddress",
 				"type": "address"
-			},
-			{
-				"indexed": False,
-				"internalType": "bool",
-				"name": "isTransaction",
-				"type": "bool"
 			}
 		],
 		"name": "Transaction",
@@ -203,12 +199,6 @@ contract_abi = [
 				"internalType": "address",
 				"name": "_contractAddress",
 				"type": "address"
-			},
-			{
-				"indexed": False,
-				"internalType": "bool",
-				"name": "isTransaction",
-				"type": "bool"
 			}
 		],
 		"name": "buyRequest",
@@ -385,7 +375,10 @@ contract_abi = [
 	}
 ]
 response = requests.get(url)
-result = response.json().get('result')
+data = response.json()
+transaction = data["items"][0]["raw_input"]
+result = data["items"]
+
 api_data_counter = len(result)-1
 oldTimeStamp= ""
 timeStamp = ""
@@ -412,72 +405,82 @@ def get_product_info():
     global oldIsTransaction
 
     response = requests.get(url)
-    result = response.json().get('result')
-    index = int(len(result)-1)
+    data = response.json()
+    transaction = data["items"][0]["raw_input"]
+    result = data["items"]
     try:
-        timeStamp = result[index]['timeStamp']
+        timeStamp = data["items"][0]["timestamp"]
     except:
         print("Max rate limit reached")
 
     print("time stamp is" + timeStamp)
     if result and len(result) > api_data_counter and oldTimeStamp != timeStamp:
-        
-        print(len(result))
+        print("first")
         oldTimeStamp=timeStamp
-        result_item = result[index]
+        result_item = data["items"][0]
         if isinstance(result_item, dict):
             topics = result_item.get('topics')
+            print("second")
         else:
             print("Unexpected result item:", result_item)
             return oldProductCode,oldRealPrice,oldSellingPrice,oldMarketAddress,oldBuyerAddress,oldWantedProductAddress,oldWantedAmountOfProduct,oldTheMoneyToBuy,oldCanSell,oldPunishAmount,oldNeedPunish,oldContractAddress,oldIsTransaction
+            print("third")
         api_data_counter = len(result)-1
-        print(len(topics))
-        if len(topics) != 2:
+        #bu cezanın kodu
+        if data["items"][0]["method"] != "0xb3f7451a":
             
             #topicin boyutu 2 ise tum bu satırları atlayıp yeni api data bulmaya gec
-            contractAddress = result[api_data_counter]['address']
+            contractAddress = data["items"][0]["to"]["hash"]
             
-            sellingPrice = int(topics[2], 16) // int(topics[1], 16)
+            sellingPrice = int(transaction[137:-128],16) // int(transaction[73:-192],16)
             
-            
-            productCode = "0x" + topics[3][-40:]  # The last 40 characters of the fourth topic
+            print("fourth")
+            productCode = "0x" + transaction[162:-64]  # The last 40 characters of the fourth topic
             needPunish = False
             realPrice = hashMapOfProducts.get(productCode.lower()) # Fetching from the hashmap using the lowercase product code
 
-            marketAddress = result[api_data_counter]['data'][26:66]  # Extracting the address, skipping the first 26 characters (24 zeros + 0x)
-            topics2 = result[api_data_counter].get('topics')
-            buyerAddress = result[api_data_counter]['data'][26:66]  # Extracting buyer address
-            isTransaction = result[api_data_counter]["data"][-1]
-            isTransaction = True if isTransaction == "1" else False
-            print(isTransaction)
-            wantedProductAddress = "0x" + topics2[3][-40:]  # Extracting wanted product address
-            wantedAmountOfProduct = int(topics2[1], 16)  # Converting hex to int for wanted amount of product
-            #bu nedir bulunmalı
-            theMoneyToBuy = int(topics2[2], 16) # Extracting money to buy and converting from hex to int
+            marketAddress = "0x" + transaction[226:]  # Extracting the address, skipping the first 26 characters (24 zeros + 0x)
             
-            dataOfMarket = exampleHashMap.get("0x"+marketAddress.lower())
+            topics2 = data["items"][0]
+            buyerAddress = transaction[226:]  # Extracting buyer address
+            isTransaction = data["items"][0]["method"]
+            isTransaction = True if isTransaction == "0xedafb22e" else False
+            print(isTransaction)
+            wantedProductAddress = "0x" + transaction[162:-64]  # Extracting wanted product address
+            wantedAmountOfProduct = int(transaction[73:-192],16)  # Converting hex to int for wanted amount of product
+            #bu nedir bulunmalı
+            theMoneyToBuy = int(transaction[137:-128],16) # Extracting money to buy and converting from hex to int
+            print("marketAddress" + marketAddress )
+            dataOfMarket = exampleHashMap.get(marketAddress.lower())
+            print("data of market is" , dataOfMarket)
             codeOfProductFromMarket, currentStock, punishAmount,stockLimit = dataOfMarket[0], dataOfMarket[1], dataOfMarket[2] , dataOfMarket[3]
             
-                
+            print("the real price is" + str(realPrice) + "the selling price is" + str(sellingPrice) + "the is transaction is" + str(isTransaction))
             if realPrice < sellingPrice and isTransaction==True:
                 needPunish = True
                 punishAmount = punishAmount +10
-                currentStock -= int(topics[1], 16)
+                currentStock -= int(transaction[73:-192],16)
+                print("5")
                 
             if needPunish == False :
                 #bu gercek depoda dusulmeli
-                currentStock -= int(topics[1], 16)
+                currentStock -= int(transaction[73:-192],16)
+                print("6")
                     #buradaki şartlar düzenlenmeli
             else:
                 checksum_contract_address = Web3.to_checksum_address(contractAddress)
                 contract = web3.eth.contract(address=checksum_contract_address, abi=contract_abi)
+                print("CURRENT MARKET ADDRESS İS" + marketAddress)
+                
                 market_checksum_address = Web3.to_checksum_address(marketAddress)
+                print("punishAmount" + str(punishAmount) + "market_checksum_address" + str(market_checksum_address ))
                 transaction = contract.functions.punish(punishAmount, market_checksum_address).build_transaction({
                     'from': account.address,
                     'nonce': web3.eth.get_transaction_count(account.address),
                     'gas': 200000,
                     'gasPrice': web3.to_wei('50', 'gwei')
                 })
+                print("7")
                 signed_txn = web3.eth.account.sign_transaction(transaction, private_key=private_key)
                 transaction_hash = web3.eth.send_raw_transaction(signed_txn.rawTransaction)
                 print("PUNİSHENT SENT")
