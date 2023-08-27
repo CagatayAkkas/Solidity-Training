@@ -12,9 +12,10 @@ The control system for preventing product tax evasion and stockpiling.
 - Buying a product without taking the bill means stealing from the government which is haram. Prevent billions of haram transaction.
 - Stopping overpriced products and usin a transparent, trustless and provable system will affect nations sociology and psychology possitively.
 
-![chain prices 3](https://github.com/CagatayAkkas/Chain-Prices/assets/108520279/feae171b-96f7-4e5e-b9fa-5a849a69b21f)
+![chain prices 3](https://github.com/CagatayAkkas/Chain-Prices/assets/108520279/12d4cfc6-766b-4e19-8240-9a751da01c2e)
 
-![chain prices transaction table ](https://github.com/CagatayAkkas/Chain-Prices/assets/108520279/c8aed6ea-54f0-4d4b-a3ff-f6a03f8df5b4)
+![chain prices transaction table ](https://github.com/CagatayAkkas/Chain-Prices/assets/108520279/aace5e8e-9d1c-4665-8061-088a06f3753b)
+
 
 ## Objectives
 
