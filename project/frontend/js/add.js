@@ -326,37 +326,35 @@ async function callMethod() {
       },
     ];
     const contract = new web3.eth.Contract(contractABI, contractAddress);
-    hesap = "0x97E7f2B08a14e4C0A8Dca87fbEB1F68b397c91df";
-    async function callContractFunction() {
-      const productCode = document.getElementById("productCode").value;
-      const productPrice = document.getElementById("productPrice").value;
-      const productAmount = document.getElementById("productAmount").value;
 
-      const functionCallData = contract.methods
-        .transaction(productAmount, productPrice, productCode, hesap)
-        .encodeABI();
+    const moneyAmountInput = document.getElementById("moneyAmount");
+    const moneyAmount = parseInt(moneyAmountInput.value); // Input değerini tamsayıya çevir
 
-      const txData = {
-        from: sender,
-        to: contractAddress,
-        data: functionCallData,
-        gas: await contract.methods
-          .transaction(productAmount, productPrice, productCode, hesap)
-          .estimateGas({ from: sender }),
-      };
+    const functionCallData = contract.methods
+      .addMoney(moneyAmount, sender)
+      .encodeABI();
 
-      try {
-        const txHash = await web3.eth.sendTransaction(txData);
-        console.log("Transaction sent. Transaction hash:", txHash);
-      } catch (error) {
-        console.error("Error sending transaction:", error);
-      }
+    const txData = {
+      from: sender,
+      to: contractAddress,
+      data: functionCallData,
+      gas: await contract.methods
+        .addMoney(moneyAmount, sender)
+        .estimateGas({ from: sender }),
+    };
+
+    try {
+      const txHash = await web3.eth.sendTransaction(txData);
+      console.log("Transaction sent. Transaction hash:", txHash);
+    } catch (error) {
+      console.error("Error sending transaction:", error);
     }
-
-    callContractFunction();
   } catch (error) {
     console.error("Error requesting accounts:", error);
   }
 }
 
-callMethod();
+// Bu kısmı sayfa yüklendiğinde çalıştırmak yerine, kullanıcının "Confirm" düğmesine tıkladığında çağırmalısınız.
+// Bu nedenle aşağıdaki satırı kaldırıp, HTML düğmesine onclick özelliği eklemelisiniz:
+// <button class="btn btn-primary" onclick="callMethod()">Confirm</button>
+// callMethod();

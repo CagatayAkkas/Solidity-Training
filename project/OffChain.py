@@ -34,12 +34,99 @@ exampleHashMap = {address[0]: [address[1], address[2],address[3],address[4]] for
 # 0xf9Cf6A857F6faA8e7600fB0B6fC45e5c28d6b458
 
 web3 = Web3(Web3.HTTPProvider('https://eth-sepolia.g.alchemy.com/v2/AsRLVXZLZMPKrruB1nFRRSGfSquRWJtA'))
-url = "https://api-sepolia.etherscan.io/api?module=logs&action=getLogs&fromBlock=0&toBlock=latest&address=0x33aA822F7A016F65080A7C39cb168ffFcb23c888&api_key=9MWB7ZQYSHVYVE7C85IPMSQUVR1CAYUTWN"
-private_key = "46fcb707d3d440ad20741f0e4d722a54817f4641ae4ecdfa6d72f25344130323"
+url = "https://api-sepolia.etherscan.io/api?module=logs&action=getLogs&fromBlock=0&toBlock=latest&address=0xEda8a77ff47e04a544C685445949Ad4BCeFeC673&api_key=9MWB7ZQYSHVYVE7C85IPMSQUVR1CAYUTWN"
+private_key = ""
 account = web3.eth.account.from_key(private_key)
 
 
 contract_abi = [
+	{
+		"anonymous": False,
+		"inputs": [
+			{
+				"indexed": True,
+				"internalType": "uint256",
+				"name": "_amountOfProduct",
+				"type": "uint256"
+			},
+			{
+				"indexed": True,
+				"internalType": "uint256",
+				"name": "_priceOfTheProduct",
+				"type": "uint256"
+			},
+			{
+				"indexed": True,
+				"internalType": "address",
+				"name": "_productCode",
+				"type": "address"
+			},
+			{
+				"indexed": False,
+				"internalType": "address",
+				"name": "_marketAddress",
+				"type": "address"
+			},
+			{
+				"indexed": False,
+				"internalType": "address",
+				"name": "_contractAddress",
+				"type": "address"
+			}
+		],
+		"name": "Transaction",
+		"type": "event"
+	},
+	{
+		"anonymous": False,
+		"inputs": [
+			{
+				"indexed": True,
+				"internalType": "uint256",
+				"name": "_amountOfProduct",
+				"type": "uint256"
+			},
+			{
+				"indexed": True,
+				"internalType": "uint256",
+				"name": "_priceOfTheProduct",
+				"type": "uint256"
+			},
+			{
+				"indexed": True,
+				"internalType": "address",
+				"name": "_productCode",
+				"type": "address"
+			},
+			{
+				"indexed": False,
+				"internalType": "address",
+				"name": "_marketAddress",
+				"type": "address"
+			},
+			{
+				"indexed": False,
+				"internalType": "address",
+				"name": "_contractAddress",
+				"type": "address"
+			}
+		],
+		"name": "buyRequest",
+		"type": "event"
+	},
+	{
+		"anonymous": False,
+		"inputs": [
+			{
+				"indexed": True,
+				"internalType": "bool",
+				"name": "_punishment",
+				"type": "bool"
+			}
+		],
+		"name": "punishment",
+		"type": "event"
+	},
 	{
 		"inputs": [
 			{
@@ -79,190 +166,17 @@ contract_abi = [
 	{
 		"inputs": [
 			{
-				"internalType": "uint256",
-				"name": "penaltyFee",
-				"type": "uint256"
-			},
-			{
-				"internalType": "address",
-				"name": "guiltyAddress",
-				"type": "address"
-			}
-		],
-		"name": "punish",
-		"outputs": [
-			{
-				"internalType": "bool",
-				"name": "",
-				"type": "bool"
-			}
-		],
-		"stateMutability": "nonpayable",
-		"type": "function"
-	},
-	{
-		"inputs": [
-			{
-				"internalType": "uint256",
-				"name": "_amountOfProduct",
-				"type": "uint256"
-			},
-			{
-				"internalType": "uint256",
-				"name": "_priceOfTheProduct",
-				"type": "uint256"
-			},
-			{
-				"internalType": "address",
-				"name": "_productCode",
-				"type": "address"
-			},
-			{
-				"internalType": "address",
-				"name": "_marketAddress",
-				"type": "address"
-			}
-		],
-		"name": "transaction",
-		"outputs": [],
-		"stateMutability": "nonpayable",
-		"type": "function"
-	},
-	{
-		"anonymous": False,
-		"inputs": [
-			{
-				"indexed": True,
-				"internalType": "uint256",
-				"name": "_amountOfProduct",
-				"type": "uint256"
-			},
-			{
-				"indexed": True,
-				"internalType": "uint256",
-				"name": "_priceOfTheProduct",
-				"type": "uint256"
-			},
-			{
-				"indexed": True,
-				"internalType": "address",
-				"name": "_productCode",
-				"type": "address"
-			},
-			{
-				"indexed": False,
-				"internalType": "address",
-				"name": "_marketAddress",
-				"type": "address"
-			},
-			{
-				"indexed": False,
-				"internalType": "address",
-				"name": "_contractAddress",
-				"type": "address"
-			},
-			{
-				"indexed": False,
-				"internalType": "bool",
-				"name": "isTransaction",
-				"type": "bool"
-			}
-		],
-		"name": "Transaction",
-		"type": "event"
-	},
-	{
-		"anonymous": False,
-		"inputs": [
-			{
-				"indexed": True,
-				"internalType": "uint256",
-				"name": "_amountOfProduct",
-				"type": "uint256"
-			},
-			{
-				"indexed": True,
-				"internalType": "uint256",
-				"name": "_priceOfTheProduct",
-				"type": "uint256"
-			},
-			{
-				"indexed": True,
-				"internalType": "address",
-				"name": "_productCode",
-				"type": "address"
-			},
-			{
-				"indexed": False,
-				"internalType": "address",
-				"name": "_marketAddress",
-				"type": "address"
-			},
-			{
-				"indexed": False,
-				"internalType": "address",
-				"name": "_contractAddress",
-				"type": "address"
-			},
-			{
-				"indexed": False,
-				"internalType": "bool",
-				"name": "isTransaction",
-				"type": "bool"
-			}
-		],
-		"name": "buyRequest",
-		"type": "event"
-	},
-	{
-		"anonymous": False,
-		"inputs": [
-			{
-				"indexed": True,
-				"internalType": "bool",
-				"name": "_punishment",
-				"type": "bool"
-			}
-		],
-		"name": "punishment",
-		"type": "event"
-	},
-	{
-		"inputs": [
-			{
-				"internalType": "uint256",
-				"name": "amountOfProduct",
-				"type": "uint256"
-			},
-			{
-				"internalType": "uint256",
-				"name": "totalPrice",
-				"type": "uint256"
-			},
-			{
-				"internalType": "address",
-				"name": "addressOfProduct",
-				"type": "address"
-			},
-			{
 				"internalType": "address",
 				"name": "marketAddress",
 				"type": "address"
 			}
 		],
-		"name": "requestProduct",
-		"outputs": [],
-		"stateMutability": "nonpayable",
-		"type": "function"
-	},
-	{
-		"inputs": [],
-		"name": "canSell",
+		"name": "checkVault",
 		"outputs": [
 			{
-				"internalType": "bool",
+				"internalType": "uint256",
 				"name": "",
-				"type": "bool"
+				"type": "uint256"
 			}
 		],
 		"stateMutability": "view",
@@ -291,25 +205,6 @@ contract_abi = [
 		"inputs": [
 			{
 				"internalType": "address",
-				"name": "marketAddress",
-				"type": "address"
-			}
-		],
-		"name": "checkVault",
-		"outputs": [
-			{
-				"internalType": "uint256",
-				"name": "",
-				"type": "uint256"
-			}
-		],
-		"stateMutability": "view",
-		"type": "function"
-	},
-	{
-		"inputs": [
-			{
-				"internalType": "address",
 				"name": "",
 				"type": "address"
 			}
@@ -323,6 +218,58 @@ contract_abi = [
 			}
 		],
 		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "uint256",
+				"name": "penaltyFee",
+				"type": "uint256"
+			},
+			{
+				"internalType": "address",
+				"name": "guiltyAddress",
+				"type": "address"
+			}
+		],
+		"name": "punish",
+		"outputs": [
+			{
+				"internalType": "bool",
+				"name": "",
+				"type": "bool"
+			}
+		],
+		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "uint256",
+				"name": "amountOfProduct",
+				"type": "uint256"
+			},
+			{
+				"internalType": "uint256",
+				"name": "totalPrice",
+				"type": "uint256"
+			},
+			{
+				"internalType": "address",
+				"name": "addressOfProduct",
+				"type": "address"
+			},
+			{
+				"internalType": "address",
+				"name": "marketAddress",
+				"type": "address"
+			}
+		],
+		"name": "requestProduct",
+		"outputs": [],
+		"stateMutability": "nonpayable",
 		"type": "function"
 	},
 	{
@@ -362,6 +309,34 @@ contract_abi = [
 			}
 		],
 		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "uint256",
+				"name": "_amountOfProduct",
+				"type": "uint256"
+			},
+			{
+				"internalType": "uint256",
+				"name": "_priceOfTheProduct",
+				"type": "uint256"
+			},
+			{
+				"internalType": "address",
+				"name": "_productCode",
+				"type": "address"
+			},
+			{
+				"internalType": "address",
+				"name": "_marketAddress",
+				"type": "address"
+			}
+		],
+		"name": "transaction",
+		"outputs": [],
+		"stateMutability": "nonpayable",
 		"type": "function"
 	},
 	{

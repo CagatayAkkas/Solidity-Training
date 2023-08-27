@@ -326,14 +326,15 @@ async function callMethod() {
       },
     ];
     const contract = new web3.eth.Contract(contractABI, contractAddress);
-    hesap = "0x97E7f2B08a14e4C0A8Dca87fbEB1F68b397c91df";
+
     async function callContractFunction() {
       const productCode = document.getElementById("productCode").value;
       const productPrice = document.getElementById("productPrice").value;
       const productAmount = document.getElementById("productAmount").value;
+      hesap = "0x97E7f2B08a14e4C0A8Dca87fbEB1F68b397c91df";
 
       const functionCallData = contract.methods
-        .transaction(productAmount, productPrice, productCode, hesap)
+        .requestProduct(productAmount, productPrice, productCode, hesap)
         .encodeABI();
 
       const txData = {
@@ -341,7 +342,7 @@ async function callMethod() {
         to: contractAddress,
         data: functionCallData,
         gas: await contract.methods
-          .transaction(productAmount, productPrice, productCode, hesap)
+          .requestProduct(productAmount, productPrice, productCode, hesap)
           .estimateGas({ from: sender }),
       };
 

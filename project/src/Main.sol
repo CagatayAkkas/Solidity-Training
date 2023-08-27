@@ -5,8 +5,8 @@ pragma solidity 0.8.13;
 // @title Main Contract
 // @dev This contract allows users to manage transactions, balances, and penalties.
 contract Main {
-    // @dev Represents the product code's address.
     address public s_productCode;
+    address public s_marketAddress;
 
     // @dev Represents the price of the product.
     uint256 public s_priceOfTheProduct;
@@ -39,18 +39,23 @@ contract Main {
     // @param moneyAmount Amount of money to add.
     // @param marketAddress Address of the market.
     function addMoney(uint256 moneyAmount, address marketAddress) public {
-        vault[marketAddress] += moneyAmount;
+        vault[marketAddress] = vault[marketAddress] + moneyAmount;
     }
 
     // @dev Function to create a transaction event.
-    // @param _productCode Address representation of the product code.
+    // @param _amountOfProduct amount of the product.
     // @param _priceOfTheProduct Price of the product.
+    // @param _productCode Address representation of the product code.
+    // @param _marketAddress address of the market.
     function transaction(
         uint256 _amountOfProduct,
         uint256 _priceOfTheProduct,
         address _productCode,
         address _marketAddress
     ) public {
+        s_priceOfTheProduct = _priceOfTheProduct;
+        s_marketAddress = _marketAddress;
+
         emit Transaction(
             _amountOfProduct,
             _priceOfTheProduct,
@@ -71,9 +76,8 @@ contract Main {
             dept[guiltyAddress] += penaltyFee - vault[guiltyAddress];
             vault[guiltyAddress] = 0;
         } else {
-            vault[guiltyAddress] -= penaltyFee;
+            vault[guiltyAddress] = vault[guiltyAddress] - penaltyFee;
         }
-        //bunu ifin icine alabiliriz
         emit punishment(true);
         return true;
     }
@@ -101,26 +105,24 @@ contract Main {
         }
     }
 
-    function buyProduct(
-        uint256 amountOfProduct,
-        uint256 totalPrice,
-        address addressOfProduct,
-        address marketAddress
-    ) public {
-        vault[marketAddress] -= totalPrice;
+    //@dev Function to decrease the money from market's account when market's buy request accepted.
+    //@param totalPrice for the amount of money market send for buying new product.
+    //@param marketAddress is for the address of market which buys the products.
+    function buyProduct(uint256 totalPrice, address marketAddress) public {
+        vault[marketAddress] = vault[marketAddress] - totalPrice;
     }
 
     // @dev Function to check the money stored in a market's vault.
     // @param marketAddress Address of the market.
     // @return Amount of money in the vault.
-    function checkVault(address marketAddress) public returns (uint256) {
+    function checkVault(address marketAddress) public view returns (uint256) {
         return vault[marketAddress];
     }
 
     // @dev Function to check the dept (owed money) of a market.
     // @param marketAddress Address of the market.
     // @return Amount of money in the dept.
-    function checkdept(address marketAddress) public returns (uint256) {
+    function checkdept(address marketAddress) public view returns (uint256) {
         return dept[marketAddress];
     }
 }

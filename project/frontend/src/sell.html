@@ -1,71 +1,98 @@
 <!DOCTYPE html>
 <html lang="tr">
-
-<head>
+  <head>
     <title>Sell Product</title>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css">
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link
+      rel="stylesheet"
+      href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css"
+    />
     <style>
-        /* Ortala "Chain Prices" Başlığı ve Stili */
-        .centered {
-            text-align: center;
-            margin-top: 40px;
-            margin-bottom: 100px;
-            font-size: 40px;
-            color: #333;
-        }
+      /* Ortala "Chain Prices" Başlığı ve Stili */
+      .centered {
+        text-align: center;
+        margin-top: 40px;
+        margin-bottom: 100px;
+        font-size: 40px;
+        color: #333;
+      }
 
-        /* Seçenekler Arası Boşluk */
-        .option-container {
-            margin-top: 20px;
-            text-align: center;
-        }
+      /* Seçenekler Arası Boşluk */
+      .option-container {
+        margin-top: 20px;
+        text-align: center;
+      }
 
-        /* Buy ve Punish Butonlarının Stili */
-        .option-card.active {
-            background-color: #007bff;
-            color: #fff;
-        }
+      /* Buy ve Punish Butonlarının Stili */
+      .option-card.active {
+        background-color: #007bff;
+        color: #fff;
+      }
 
-        /* Buy ve Punish Butonlarının Siyah Rengi */
-        .nav-pills .nav-link.option-card {
-            color: black;
-        }
+      /* Buy ve Punish Butonlarının Siyah Rengi */
+      .nav-pills .nav-link.option-card {
+        color: black;
+      }
 
-        /* Seçili Butonların Rengi */
-        .nav-pills .nav-link.option-card.active {
-            background-color: black;
-            color: white;
-        }
+      /* Seçili Butonların Rengi */
+      .nav-pills .nav-link.option-card.active {
+        background-color: black;
+        color: white;
+      }
     </style>
-</head>
+    <script src="https://cdn.jsdelivr.net/npm/web3@1.5.2/dist/web3.min.js"></script>
+    <script src="https://github.com/ChainSafe/web3.js/blob/v1.2.11/dist/web3.min.js"></script>
+    <script src="../js/sell.js"></script>
+  </head>
 
-<body>
+  <body>
     <div class="container">
-        <a href="main.html" style="text-decoration: none;"><h2 class="mt-4 centered">Chain Prices</h2></a>
-        <h3>Sell Product</h3>
-        <div class="row mt-4">
-            <div class="col">
-                <input type="text" class="form-control" id="walletAddress" placeholder="Product Code">
-            </div>
+      <a href="main.html" style="text-decoration: none"
+        ><h2 class="mt-4 centered">Chain Prices</h2></a
+      >
+      <h3>Sell Product</h3>
+      <div class="row mt-4">
+        <div class="col">
+          <input
+            type="text"
+            class="form-control"
+            id="productCode"
+            placeholder="Product Code"
+          />
         </div>
-        <div class="row mt-4">
-            <div class="col">
-                <input type="text" class="form-control" id="walletAddress" placeholder="Product Price">
-            </div>
+      </div>
+      <div class="row mt-4">
+        <div class="col">
+          <input
+            type="text"
+            class="form-control"
+            id="productPrice"
+            placeholder="Product Price"
+          />
         </div>
-        <div class="row mt-4">
-            <div class="col">
-                <button class="btn btn-primary" onclick="navigate()">Confirm</button>
-            </div>
+      </div>
+      <div class="row mt-4">
+        <div class="col">
+          <input
+            type="text"
+            class="form-control"
+            id="productAmount"
+            placeholder="Product Amount"
+          />
         </div>
+      </div>
+      <div class="row mt-4">
+        <div class="col">
+          <button class="btn btn-primary" onclick="callMethod()">
+            Confirm
+          </button>
+        </div>
+      </div>
     </div>
 
-    <script src="sell.js"></script>
     <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.1/dist/umd/popper.min.js"></script>
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/js/bootstrap.min.js"></script>
-</body>
-
+  </body>
 </html>

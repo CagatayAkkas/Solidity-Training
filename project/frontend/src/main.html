@@ -13,6 +13,7 @@
       a {
         text-decoration: none;
       }
+
       .centered {
         text-align: center;
         margin-top: 40px;
@@ -43,6 +44,19 @@
         background-color: black;
         color: white;
       }
+
+      /* Özel Connect Butonu Stili */
+      .connect-button {
+        padding: 20px 40px;
+        /* Adjust padding to control button size */
+        font-size: 24px;
+        border-radius: 10px;
+        display: block;
+        margin: 100px auto 0; /* Yeni margin değeri */
+        background-color: #333;
+        text-align: center; /* Düğme içeriğini yatayda ortala */
+        position: relative; /* Pozisyonu değiştirme */
+      }
     </style>
   </head>
 
@@ -61,7 +75,7 @@
             data-toggle="pill"
             href="#buy"
             onclick="setNavigation('Buy')"
-            >Buy</a
+            >Buy Product</a
           >
         </li>
         <li class="nav-item">
@@ -70,7 +84,16 @@
             data-toggle="pill"
             href="#sell"
             onclick="setNavigation('Sell')"
-            >Sell</a
+            >Sell Product</a
+          >
+        </li>
+        <li class="nav-item">
+          <a
+            class="nav-link option-card"
+            data-toggle="pill"
+            href="#add"
+            onclick="setNavigation('Add')"
+            >Add Money</a
           >
         </li>
         <li class="nav-item">
@@ -79,7 +102,7 @@
             data-toggle="pill"
             href="#punish"
             onclick="setNavigation('Punish')"
-            >Money</a
+            >Money Amount</a
           >
         </li>
         <li class="nav-item">
@@ -103,22 +126,14 @@
         </div>
       </div>
       <div class="row mt-4">
-        <div class="col">
-          <input
-            type="text"
-            class="form-control"
-            id="walletAddress"
-            placeholder="Cüzdan Adresi"
-          />
-        </div>
-      </div>
-      <div class="row mt-4">
-        <div class="col">
-          <button class="btn btn-primary" onclick="navigate()">Confirm</button>
+        <div class="col text-center">
+          <button class="btn btn-primary connect-button" onclick="navigate()">
+            Connect Wallet
+          </button>
         </div>
       </div>
     </div>
-
+    <script src="https://cdn.jsdelivr.net/npm/@metamask/dapp@2.0.0/dist/index.min.js"></script>
     <script>
       var selectedNavigation = "Buy";
 
@@ -140,16 +155,34 @@
         selectedCard.classList.add("active");
       }
 
-      function navigate() {
-        var walletAddress = document.getElementById("walletAddress").value;
-        if (selectedNavigation !== "" && walletAddress !== "") {
-          var destination = selectedNavigation.toLowerCase() + ".html";
-          // Yönlendirme işlemi
-          window.location.href =
-            destination + "?wallet=" + encodeURIComponent(walletAddress);
+      async function navigate() {
+        // Yönlendirme işlemi
+        if (typeof window.ethereum !== "undefined") {
+          try {
+            // Metamask ile etkileşime geç
+            await window.ethereum.enable();
+
+            // Kullanıcının seçtiği hesapları al
+            const accounts = await window.ethereum.request({
+              method: "eth_accounts",
+            });
+
+            if (accounts.length > 0) {
+              const selectedAddress = accounts[0];
+              var destination = selectedNavigation.toLowerCase() + ".html";
+              window.location.href =
+                destination + "?wallet=" + encodeURIComponent(selectedAddress);
+
+              // Burada istediğiniz işlemleri yapabilirsiniz
+              // Örneğin, bu Ethereum adresiyle bir kontrat etkileşimi yapabilirsiniz.
+            } else {
+              alert("Hiçbir hesap seçilmedi.");
+            }
+          } catch (error) {
+            alert("Bağlantı hatası:", error);
+          }
         } else {
-          // Input boş ise uyarı ver
-          alert("Please check inputs.");
+          alert("Metamask bulunamadı. Lütfen yükleyin veya etkinleştirin.");
         }
       }
     </script>

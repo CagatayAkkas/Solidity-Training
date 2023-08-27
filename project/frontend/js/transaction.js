@@ -69,7 +69,7 @@ function updateData(newData) {
     // Check if the 'topics' array exists and has a length of at least 2
     if (newItem) {
       var addressCell = newRow.insertCell(0);
-      var slicedData = newItem.marketAddress;
+      var slicedData = "0x" + newItem.marketAddress;
       var canSell = newItem.canSell;
       addressCell.className = "scrollable-cell";
       var link = document.createElement("a");
