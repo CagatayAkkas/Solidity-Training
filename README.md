@@ -4,7 +4,7 @@
 
 The control system for preventing product tax evasion and stockpiling.
 
-###Benefits
+##Benefits
 
 - Keep all the stolen money (millions of dolars) in the system.
 - Keep all the money which spent as transaction fee for each transaction(0.5 billion transactions in year) done with credit cards.
