@@ -30,6 +30,7 @@ The control system for preventing product tax evasion and stockpiling.
 3. Penalty to sellers for incorrect transactions.
 4. View past transaction.
 5. Control product stock
+6. Pull data from on-chain to off-chain with using API
 
 ## Requirements
 
